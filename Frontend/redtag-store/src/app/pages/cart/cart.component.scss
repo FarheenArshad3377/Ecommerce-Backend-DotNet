@@ -1,0 +1,333 @@
+@use '../../../shared/styles/tokens.scss' as *;
+
+.cart-page {
+  background: $black;
+  min-height: 100vh;
+  font-family: $font-body;
+  color: $text-light;
+  display: flex;
+  flex-direction: column;
+}
+
+// ===== Header =====
+.header {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 24px;
+  padding: 16px 32px;
+  background: $card-bg;
+  border-bottom: 1px solid $border-subtle;
+}
+
+.logo {
+  font-family: $font-heading;
+  font-weight: 600;
+  font-size: 21px;
+  color: $text-light;
+  white-space: nowrap;
+  span { color: $red-primary; }
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  justify-self: center;
+
+  a {
+    font-size: 13.5px;
+    font-weight: 600;
+    color: $text-light;
+    text-decoration: none;
+    &:hover { color: $red-primary; }
+  }
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  justify-self: end;
+}
+
+.icon-btn {
+  position: relative;
+  background: none;
+  border: none;
+  color: $text-light;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  border-radius: 50%;
+  transition: background 0.15s ease, color 0.15s ease;
+  &:hover { background: $black; color: $red-primary; }
+}
+
+.badge-count {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  background: $red-primary;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  min-width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid $card-bg;
+}
+
+// ===== Main =====
+.cart-main {
+  flex: 1;
+  padding: 40px 48px;
+  max-width: 1400px;
+  margin: 0 auto;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.page-title {
+  font-family: $font-heading;
+  font-weight: 700;
+  font-size: 42px;
+  margin: 0 0 32px;
+  color: $text-light;
+}
+
+.cart-layout {
+  display: grid;
+  grid-template-columns: 1.8fr 1fr;
+  gap: 24px;
+  align-items: start;
+}
+
+// ===== Cart items =====
+.cart-items {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.cart-item {
+  display: flex;
+  gap: 20px;
+  background: $card-bg;
+  border: 1px solid $border-subtle;
+  border-radius: $radius-md;
+  padding: 20px;
+  box-shadow: $shadow-card;
+}
+
+.item-image {
+  width: 130px;
+  height: 130px;
+  object-fit: cover;
+  border-radius: $radius-sm;
+  flex-shrink: 0;
+}
+
+.item-details {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.item-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+
+  h3 {
+    font-family: $font-heading;
+    font-size: 19px;
+    font-weight: 600;
+    margin: 0;
+    color: $text-light;
+  }
+}
+
+.delete-btn {
+  background: none;
+  border: none;
+  color: $text-muted;
+  cursor: pointer;
+  padding: 2px;
+  display: flex;
+  transition: color 0.15s ease;
+  &:hover { color: $red-primary; }
+}
+
+.item-meta {
+  color: $text-muted;
+  font-size: 13.5px;
+  margin: 0;
+}
+
+.item-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: auto;
+}
+
+.qty-control {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  border: 1.5px solid $border-strong;
+  border-radius: $radius-sm;
+  overflow: hidden;
+  width: fit-content;
+
+  button {
+    background: none;
+    border: none;
+    color: $text-light;
+    font-size: 16px;
+    cursor: pointer;
+    width: 34px;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s ease;
+
+    &:hover:not(:disabled) { background: $black; }
+    &:disabled { opacity: 0.3; cursor: not-allowed; }
+  }
+
+  span {
+    font-weight: 600;
+    font-size: 14px;
+    min-width: 32px;
+    text-align: center;
+  }
+}
+
+.item-price {
+  font-family: $font-heading;
+  font-weight: 700;
+  font-size: 19px;
+  color: $red-primary;
+}
+
+// ===== Order summary =====
+.order-summary {
+  background: $card-bg;
+  border: 1px solid $border-subtle;
+  border-radius: $radius-md;
+  padding: 28px;
+  box-shadow: $shadow-card;
+
+  h2 {
+    font-family: $font-heading;
+    font-size: 22px;
+    font-weight: 700;
+    margin: 0 0 20px;
+    color: $text-light;
+  }
+}
+
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  font-size: 14.5px;
+
+  .label { color: $text-muted; }
+  .value { color: $text-light; font-weight: 600; }
+  .value.muted { color: $text-muted; font-weight: 500; font-size: 13.5px; }
+}
+
+.summary-divider {
+  border: none;
+  border-top: 1px solid $border-subtle;
+  margin: 8px 0 12px;
+}
+
+.total-row {
+  padding-top: 4px;
+  .label { color: $text-light; font-size: 17px; font-weight: 700; }
+  .value { font-size: 22px; font-family: $font-heading; color: $red-primary; }
+}
+
+.checkout-btn {
+  @include gold-button;
+  width: 100%;
+  font-size: 14.5px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  margin-top: 20px;
+}
+
+.secure-note {
+  text-align: center;
+  color: $text-muted;
+  font-size: 12.5px;
+  margin: 14px 0 0;
+}
+
+// ===== Empty cart =====
+.empty-cart {
+  text-align: center;
+  padding: 80px 20px;
+  color: $text-muted;
+  p { font-size: 16px; margin-bottom: 20px; }
+}
+
+.shop-now-btn {
+  @include gold-button;
+  font-size: 13px;
+  padding: 12px 28px;
+}
+
+// ===== Footer =====
+.footer {
+  border-top: 1px solid $border-subtle;
+  padding: 24px 48px;
+  margin-top: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  background: $card-bg;
+}
+
+.footer-copy {
+  color: $text-muted;
+  font-size: 13px;
+  margin: 0;
+}
+
+.footer-nav {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+
+  a {
+    color: $text-light;
+    font-size: 13.5px;
+    text-decoration: none;
+    &:hover { color: $red-primary; }
+  }
+}
+
+// ===== Responsive =====
+@media (max-width: 900px) {
+  .cart-layout { grid-template-columns: 1fr; }
+  .nav-links { display: none; }
+  .cart-main { padding: 24px 16px; }
+  .footer { padding: 20px 16px; flex-direction: column; text-align: center; }
+  .item-image { width: 90px; height: 90px; }
+  .page-title { font-size: 30px; }
+}

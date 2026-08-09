@@ -1,0 +1,302 @@
+@use '../../../shared/styles/tokens.scss' as *;
+
+.account-page {
+  background: $black;
+  min-height: 100vh;
+  font-family: $font-body;
+  color: $text-light;
+}
+
+// ===== Header =====
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 32px;
+  background: $card-bg;
+  border-bottom: 1px solid $border-subtle;
+}
+
+.logo {
+  font-family: $font-heading;
+  font-weight: 600;
+  font-size: 21px;
+  color: $text-light;
+  text-decoration: none;
+  span { color: $red-primary; }
+}
+
+.nav-links {
+  display: flex;
+  gap: 22px;
+
+  a {
+    font-size: 13.5px;
+    font-weight: 600;
+    color: $text-light;
+    text-decoration: none;
+    &:hover { color: $red-primary; }
+  }
+}
+
+// ===== Main layout =====
+.account-main {
+  min-height: calc(100vh - 68px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+}
+
+// ===== Account (logged in) card =====
+.account-card {
+  background: $card-bg;
+  border: 1px solid $border-subtle;
+  border-radius: $radius-lg;
+  padding: 40px;
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+}
+
+.avatar-circle {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: $red-primary;
+  color: #fff;
+  font-family: $font-heading;
+  font-weight: 700;
+  font-size: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 18px;
+  text-transform: uppercase;
+}
+
+.account-title {
+  font-family: $font-heading;
+  font-size: 22px;
+  font-weight: 600;
+  margin: 0 0 24px;
+  color: $text-light;
+}
+
+.account-info {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 18px 0;
+  border-top: 1px solid $border-subtle;
+  border-bottom: 1px solid $border-subtle;
+  margin-bottom: 24px;
+  text-align: left;
+}
+
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.info-label {
+  font-size: 12.5px;
+  color: $text-muted;
+}
+
+.info-value {
+  font-size: 14px;
+  font-weight: 600;
+  color: $text-light;
+}
+
+.account-links {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+
+.account-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background: $black;
+  border: 1px solid $border-subtle;
+  border-radius: $radius-sm;
+  color: $text-light;
+  font-size: 13.5px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: border-color 0.15s ease, color 0.15s ease;
+
+  &:hover {
+    border-color: $red-primary;
+    color: $red-primary;
+  }
+}
+
+.logout-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 12px 0;
+  border-radius: $radius-sm;
+  border: 1px solid $red-primary;
+  background: transparent;
+  color: $red-primary;
+  font-size: 13.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+
+  &:hover {
+    background: $red-primary;
+    color: #fff;
+  }
+}
+
+// ===== Login card =====
+.login-card {
+  background: $card-bg;
+  border: 1px solid $border-subtle;
+  border-radius: $radius-lg;
+  padding: 40px;
+  width: 100%;
+  max-width: 380px;
+}
+
+.login-title {
+  font-family: $font-heading;
+  font-size: 22px;
+  font-weight: 600;
+  margin: 0 0 6px;
+  color: $text-light;
+  text-align: center;
+}
+
+.login-subtitle {
+  font-size: 13px;
+  color: $text-muted;
+  text-align: center;
+  margin: 0 0 28px;
+}
+
+.form-group {
+  margin-bottom: 18px;
+
+  label {
+    display: block;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: $text-muted;
+    margin-bottom: 6px;
+  }
+
+  input {
+    width: 100%;
+    padding: 11px 14px;
+    background: $black;
+    border: 1px solid $border-subtle;
+    border-radius: $radius-sm;
+    color: $text-light;
+    font-size: 13.5px;
+    outline: none;
+    transition: border-color 0.15s ease;
+    box-sizing: border-box;
+
+    &::placeholder { color: $text-muted; }
+    &:focus { border-color: $red-primary; }
+  }
+}
+
+.form-error {
+  font-size: 12.5px;
+  color: $red-primary;
+  margin: -8px 0 16px;
+}
+
+.login-submit-btn {
+  @include gold-button;
+  width: 100%;
+  padding: 12px 0;
+  border-radius: $radius-sm;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+// ===== Logout confirmation modal =====
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+}
+
+.modal-box {
+  background: $card-bg;
+  border: 1px solid $border-subtle;
+  border-radius: $radius-md;
+  padding: 28px;
+  width: 100%;
+  max-width: 340px;
+  text-align: center;
+
+  h3 {
+    font-family: $font-heading;
+    font-size: 18px;
+    font-weight: 600;
+    color: $text-light;
+    margin: 0 0 10px;
+  }
+
+  p {
+    font-size: 13.5px;
+    color: $text-muted;
+    margin: 0 0 22px;
+    line-height: 1.5;
+  }
+}
+
+.modal-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.modal-btn {
+  flex: 1;
+  padding: 10px 0;
+  border-radius: $radius-sm;
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid $border-subtle;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.modal-btn-cancel {
+  background: $black;
+  color: $text-light;
+  &:hover { border-color: $text-muted; }
+}
+
+.modal-btn-confirm {
+  background: $red-primary;
+  color: #fff;
+  border-color: $red-primary;
+  &:hover { filter: brightness(0.9); }
+}
+
+@media (max-width: 480px) {
+  .account-card, .login-card {
+    padding: 28px 22px;
+  }
+}

@@ -14,7 +14,6 @@ namespace Ecommerce.Controllers
     {
         private readonly AppDbContext _context;
         private readonly JwtService _jwtService;
-
         public AuthController(AppDbContext context, JwtService jwtService)
         {
             _context = context;
@@ -55,6 +54,7 @@ namespace Ecommerce.Controllers
 
             return Ok(new AuthResponseDTO
             {
+                UserId = user.UserID,
                 Token = token,
                 Email = user.Email,
                 FirstName = user.FirstName,
@@ -83,6 +83,7 @@ namespace Ecommerce.Controllers
 
             return Ok(new AuthResponseDTO
             {
+                UserId = user.UserID,
                 Token = token,
                 Email = user.Email,
                 FirstName = user.FirstName,

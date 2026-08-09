@@ -1,0 +1,53 @@
+<div class="auth-page">
+  <div class="auth-card">
+    <h1 class="brand">RedTag Store</h1>
+    <p class="subtitle">Premium Value Defined.</p>
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="auth-form">
+
+      <div class="field">
+        <label for="email">Email Address</label>
+        <div class="input-wrap">
+          <svg class="icon" viewBox="0 0 24 24" width="16" height="16" fill="none">
+            <path d="M3 6h18v12H3V6zm0 0l9 7 9-7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <input id="email" type="email" formControlName="email" placeholder="Enter your email" />
+        </div>
+        <span class="error" *ngIf="form.get('email')?.touched && form.get('email')?.invalid">
+          Sahi email address likhein
+        </span>
+      </div>
+
+      <div class="field">
+        <div class="field-header">
+          <label for="password">Password</label>
+          <a class="forgot-link" routerLink="/forgot-password">Forgot password?</a>
+        </div>
+        <div class="input-wrap">
+          <svg class="icon" viewBox="0 0 24 24" width="16" height="16" fill="none">
+            <rect x="5" y="11" width="14" height="9" rx="2" stroke="currentColor" stroke-width="1.8"/>
+            <path d="M8 11V8a4 4 0 018 0v3" stroke="currentColor" stroke-width="1.8"/>
+          </svg>
+          <input [type]="showPassword() ? 'text' : 'password'" id="password" formControlName="password" placeholder="Enter your password" />
+          <button type="button" class="toggle-eye" (click)="togglePassword()">
+            {{ showPassword() ? '🙈' : '👁' }}
+          </button>
+        </div>
+        <span class="error" *ngIf="form.get('password')?.touched && form.get('password')?.invalid">
+          Password zaroori hai
+        </span>
+      </div>
+
+      <div class="error form-error" *ngIf="errorMessage()">{{ errorMessage() }}</div>
+
+      <button type="submit" class="submit-btn" [disabled]="isSubmitting()">
+        {{ isSubmitting() ? 'Logging in...' : 'Log In' }}
+        <svg *ngIf="!isSubmitting()" viewBox="0 0 24 24" width="16" height="16" fill="none">
+          <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+    </form>
+
+    <p class="footer-link">Don't have an account? <a routerLink="/signup">Sign Up</a></p>
+  </div>
+</div>

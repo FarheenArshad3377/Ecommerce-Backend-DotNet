@@ -1,0 +1,45 @@
+<div class="orders-page-wrapper">
+<div class="orders-page">
+  <h1>My Orders</h1>
+
+  <div class="state-block" *ngIf="loading()">
+    <div class="spinner"></div>
+    <p>Loading orders...</p>
+  </div>
+
+  <div class="empty-state" *ngIf="!loading() && orders().length === 0">
+    <p>Abhi tak koi order nahi hai.</p>
+    <a routerLink="" class="primary-btn">Start Shopping </a>
+  </div>
+
+  <div class="orders-list" *ngIf="!loading() && orders().length > 0">
+    <div class="order-card" *ngFor="let order of orders()">
+      <div class="order-card-header">
+        <div>
+          <strong>{{ order.orderNumber }}</strong>
+          <span class="order-date">{{ order.createdDate | date: 'MMM d, y' }}</span>
+        </div>
+        <span class="status-badge" [ngClass]="statusClass(order.status)">{{ order.status }}</span>
+      </div>
+
+      <div class="order-card-body">
+        <span>{{ order.itemCount }} item(s)</span>
+        <span class="order-total">${{ order.finalAmount.toFixed(2) }}</span>
+      </div>
+
+      <div class="order-card-footer">
+        <span class="payment-info" *ngIf="order.payment">
+          {{ order.payment.method }} — {{ order.payment.status }}
+        </span>
+        <div class="order-actions">
+          <button type="button" class="text-btn" *ngIf="canCancel(order.status)"
+                  (click)="cancelOrder(order.orderID)" [disabled]="cancellingId() === order.orderID">
+            {{ cancellingId() === order.orderID ? 'Cancelling...' : 'Cancel Order' }}
+          </button>
+          <a class="text-btn" [routerLink]="['/orders', order.orderID]">View Details →</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>

@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Ecommerce.Services.AI;
+using Ecommerce.Workers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -41,11 +43,13 @@ builder.Services.AddAuthentication(options =>
 builder.Services.AddAuthorization();
 
 // ─── CORS ────────────────────────────────────────────────────────────────────
+// 👇 Vercel deploy hone tak sab origins allow (testing ke liye).
+// Jab Vercel URL mil jaye, ise WithOrigins(...) mein exact URL se replace kar dena — safer hai.
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
     {
-        policy.WithOrigins("http://localhost:3000", "http://localhost:5173")
+        policy.SetIsOriginAllowed(origin => true)   // 👈 Temporary — sab origins allow karega
               .AllowAnyHeader()
               .AllowAnyMethod();
     });
@@ -54,12 +58,34 @@ builder.Services.AddCors(options =>
 // ─── Controllers ─────────────────────────────────────────────────────────────
 builder.Services.AddControllers();
 
+// ─── Swagger (API docs/testing) ──────────────────────────────────────────────
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.ResolveConflictingActions(apiDescriptions => apiDescriptions.First());
+});
+// HttpClient for Gemini API Calls
+builder.Services.AddHttpClient();
+
+// Inject AI Services
+builder.Services.AddScoped<IEmbeddingService, EmbeddingService>();
+builder.Services.AddScoped<IVectorSearchService, VectorSearchService>();
+builder.Services.AddScoped<IPromptService, PromptService>();
+builder.Services.AddScoped<IChatbotService, ChatbotService>();
+
+// Register Background Auto-Sync Worker
+builder.Services.AddHostedService<ProductEmbeddingWorker>();
+
 // ─── Build App ───────────────────────────────────────────────────────────────
 var app = builder.Build();
 
-app.UseHttpsRedirection();
-app.UseCors("AllowFrontend");
+// 👇 Swagger — ab Development AUR Production dono mein chalega (testing ke liye)
+app.UseSwagger();
+app.UseSwaggerUI();
 
+// app.UseHttpsRedirection();   // ⚠️ local dev ke liye comment out — HTTP requests block ho rahe the isse
+app.UseCors("AllowFrontend");   // CORS Auth se pehle hona chahiye
+app.UseStaticFiles();
 app.UseAuthentication();
 app.UseAuthorization();
 

@@ -1,0 +1,35 @@
+<div class="p-6">
+  <div *ngIf="loading" class="text-center py-10">Loading...</div>
+  <div *ngIf="errorMsg" class="text-red-600 text-center">{{ errorMsg }}</div>
+
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-4" *ngIf="!loading">
+    <div *ngFor="let p of products" [routerLink]="['/product', p.productID]"
+         class="border rounded overflow-hidden cursor-pointer hover:shadow-lg">
+      <img [src]="p.imageUrl" [alt]="p.productName" class="w-full h-48 object-cover" />
+      <div class="p-3">
+        <h3 class="font-semibold text-sm">{{ p.productName }}</h3>
+        <p class="text-xs text-gray-500">{{ p.category }}</p>
+        <div class="mt-1">
+          <span class="font-bold" *ngIf="p.discountPrice">Rs. {{ p.discountPrice }}</span>
+          <span [class.line-through]="p.discountPrice" class="text-gray-500 text-sm ml-1">
+            Rs. {{ p.price }}
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="!loading && products.length === 0" class="text-center py-10 text-gray-500">
+    No products found in this category.
+  </div>
+
+  <!-- Pagination -->
+  <div class="flex justify-center gap-2 mt-6" *ngIf="totalPages > 1">
+    <button *ngFor="let pg of [].constructor(totalPages); let i = index"
+            (click)="goToPage(i + 1)"
+            [class.font-bold]="currentPage === i + 1"
+            class="px-3 py-1 border rounded">
+      {{ i + 1 }}
+    </button>
+  </div>
+</div>

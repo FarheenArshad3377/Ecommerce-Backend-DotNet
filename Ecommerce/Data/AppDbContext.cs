@@ -1,4 +1,5 @@
-﻿using Ecommerce.Models;
+﻿using Ecommerce.Model;
+using Ecommerce.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace Ecommerce.Data
@@ -21,7 +22,8 @@ namespace Ecommerce.Data
         public DbSet<OrderItemModel> OrderItems { get; set; }
         public DbSet<PaymentModel> Payments { get; set; }
         public DbSet<ReviewModel> Reviews { get; set; }
-
+        public DbSet<RecentlyViewedModel> RecentlyViewed { get; set; }
+        public DbSet<ChatBotHistoryModel> ChatBotHistories { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

@@ -1,0 +1,153 @@
+<div class="product-page">
+
+  <!-- Header — same pattern as home -->
+  <header class="header">
+    <div class="logo">RedTag <span>Store</span></div>
+    <!-- <nav class="nav-links">
+      <a routerLink="/products">Shop</a>
+      <a routerLink="/categories">Categories</a>
+      <a routerLink="/sale">Sale</a>
+      <a routerLink="/new-arrivals">New Arrivals</a>
+    </nav> -->
+    <div class="header-actions">
+      <button class="icon-btn" routerLink="/account">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none">
+          <circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="1.8"/>
+          <path d="M4 20c0-3.3 3.6-6 8-6s8 2.7 8 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
+      </button>
+      <button class="icon-btn" routerLink="/cart">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none">
+          <circle cx="9" cy="21" r="1.4" fill="currentColor"/>
+          <circle cx="18" cy="21" r="1.4" fill="currentColor"/>
+          <path d="M2 3h2l2.4 12.4a2 2 0 002 1.6h8.2a2 2 0 002-1.6L21 7H6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- Loading -->
+  <div class="state-block" *ngIf="loading()">
+    <div class="spinner"></div>
+    <p>Product load ho raha hai...</p>
+  </div>
+
+  <!-- Error -->
+  <div class="state-block error-block" *ngIf="!loading() && error()">
+    <p>{{ error() }}</p>
+  </div>
+
+  <!-- Product main -->
+  <main class="product-main" *ngIf="!loading() && !error() && product() as p">
+   <div class="product-layout">
+
+  <!-- Gallery — wrapped in flex container -->
+  <div class="gallery">
+    <div class="thumbnails" *ngIf="getGalleryImages().length > 1">
+      <button class="thumb"
+              *ngFor="let img of getGalleryImages(); let i = index"
+              [class.active]="i === selectedImageIndex()"
+              (click)="selectedImageIndex.set(i)">
+        <img [src]="img" [alt]="p.productName + ' thumbnail'" />
+      </button>
+    </div>
+
+    <div class="main-image-wrap">
+      <span class="quality-badge" *ngIf="hasDiscount()">SALE</span>
+      <span class="quality-badge featured" *ngIf="!hasDiscount() && p.isFeatured">Featured</span>
+      <img class="main-image" [src]="getMainImage()" [alt]="p.productName" />
+    </div>
+  </div>
+      <!-- Info -->
+      <div class="product-info">
+        <span class="sku-line">SKU: {{ p.sku }}</span>
+        <h1 class="product-title">{{ p.productName }}</h1>
+
+        <div class="rating-row" *ngIf="p.totalReviews > 0">
+          <span class="stars">
+            <svg *ngFor="let star of [1,2,3,4,5]" viewBox="0 0 24 24" width="16" height="16"
+                 [attr.fill]="star <= p.averageRating ? 'currentColor' : 'none'" stroke="currentColor" stroke-width="1.5">
+              <path d="M12 3l2.6 5.5 6 .8-4.4 4.2 1.1 6-5.3-2.9-5.3 2.9 1.1-6L3.4 9.3l6-.8L12 3z" stroke-linejoin="round"/>
+            </svg>
+          </span>
+          <span class="review-count">{{ p.totalReviews }} reviews</span>
+        </div>
+
+        <div class="price-row">
+          <span class="price">${{ formatPrice(hasDiscount() ? p.discountPrice : p.price) }}</span>
+          <span class="price-old" *ngIf="hasDiscount()">${{ formatPrice(p.price) }}</span>
+        </div>
+
+        <div class="qty-section">
+          <span class="qty-label">Quantity</span>
+          <div class="qty-control">
+            <button (click)="decreaseQty()" [disabled]="qty() <= 1">−</button>
+            <span>{{ qty() }}</span>
+            <button (click)="increaseQty()" [disabled]="qty() >= p.stock">+</button>
+          </div>
+        </div>
+
+        <button class="add-cart-btn" (click)="addToCart()" [disabled]="p.stock === 0">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none">
+            <circle cx="9" cy="21" r="1.4" fill="currentColor"/>
+            <circle cx="18" cy="21" r="1.4" fill="currentColor"/>
+            <path d="M2 3h2l2.4 12.4a2 2 0 002 1.6h8.2a2 2 0 002-1.6L21 7H6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          {{ p.stock === 0 ? 'Out of Stock' : 'Add to Cart' }}
+        </button>
+
+        <button class="buy-now-btn" (click)="buyNow()" [disabled]="p.stock === 0">Buy Now</button>
+
+        <div class="features-row">
+          <div class="feature" *ngFor="let feature of features">
+            <span class="feature-icon" [innerHTML]="feature.icon"></span>
+            <span>{{ feature.label }}</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs-section">
+      <div class="tabs-header">
+        <button class="tab-btn"
+                *ngFor="let tab of tabs"
+                [class.active]="activeTab() === tab.id"
+                (click)="activeTab.set(tab.id)">
+          {{ tab.label }}
+        </button>
+      </div>
+
+      <div class="tab-content" *ngIf="activeTab() === 'description'">
+        <p>{{ p.productName }} — {{ p.category }} category ka premium product, jo quality aur value dono provide karta hai.</p>
+      </div>
+
+      <div class="tab-content" *ngIf="activeTab() === 'reviews'">
+        <p class="placeholder-text">
+          {{ p.totalReviews > 0 ? p.totalReviews + ' reviews, average rating ' + p.averageRating.toFixed(1) : 'Abhi koi review nahi hai.' }}
+        </p>
+      </div>
+
+      <div class="tab-content" *ngIf="activeTab() === 'shipping'">
+        <p class="placeholder-text">Free shipping available. Delivery time 3-5 business days.</p>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <div class="footer-logo">RedTag Store</div>
+        <p class="footer-tagline">© 2024 RedTag Store. All rights reserved.</p>
+      </div>
+      <nav class="footer-nav">
+        <a routerLink="/new-arrivals">New Arrivals</a>
+        <a routerLink="/support">Support</a>
+        <a routerLink="/privacy-policy">Privacy Policy</a>
+      </nav>
+    </div>
+  </footer>
+
+</div>

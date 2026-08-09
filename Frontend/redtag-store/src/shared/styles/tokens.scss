@@ -1,0 +1,73 @@
+// ============================================
+// RedTag Store — Tag Paper & Crimson Tokens
+// ============================================
+
+// Colors
+$red-primary: #C4123F;
+$red-deep: #7A0B29;
+$red-glow: rgba(196, 18, 63, 0.18);
+
+$black: #FAF8F5;        // was #F3EEE4 — much closer to white, just a whisper of warmth
+$black-soft: #F2EEE7;   // was #EAE2D2 — lightened to match
+$card-bg: #FFFFFF;
+
+$gold: #B78A34;
+$gold-soft: #9C7529;
+
+$text-light: #241B1D;
+$text-muted: rgba(36, 27, 29, 0.58);
+$text-dark: #FFFFFF;
+
+$border-subtle: rgba(196, 18, 63, 0.14);
+$border-strong: rgba(196, 18, 63, 0.35);
+
+// Typography
+$font-heading: 'Fraunces', serif;
+$font-body: 'Inter', sans-serif;
+
+// Radii & shadows
+$radius-sm: 8px;
+$radius-md: 14px;
+$radius-lg: 22px;
+$shadow-card: 0 20px 50px rgba(36, 27, 29, 0.14);
+$shadow-glow: 0 0 30px $red-glow;
+
+// Mixins
+@mixin gold-button {
+  background: $red-primary;
+  color: $text-dark;
+  font-family: $font-heading;
+  font-weight: 600;
+  border: none;
+  border-radius: $radius-sm;
+  padding: 13px 20px;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+
+  &:hover {
+    background: $red-deep;
+    transform: translateY(-1px);
+    box-shadow: 0 8px 24px rgba(196, 18, 63, 0.3);
+  }
+  &:active { transform: translateY(0); }
+}
+
+@mixin dark-input {
+  width: 100%;
+  background: $black-soft;
+  border: 1.5px solid $border-subtle;
+  border-radius: $radius-sm;
+  padding: 13px 14px 13px 42px;
+  color: $text-light;
+  font-family: $font-body;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.15s ease, background 0.15s ease;
+
+  &::placeholder { color: $text-muted; }
+
+  &:focus {
+    border-color: $red-primary;
+    background: #fff;
+  }
+}

@@ -1,0 +1,23 @@
+/* You can add global styles to this file, and also import other style files */
+ // styles.scss (global file) *
+
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+  background: #000; // taake koi bhi gap black hi dikhe
+  // overflow: hidden;  // pura page scroll na kare
+}
+
+// Angular ka root component tag - agar aapka selector different hai
+// to browser inspect kar ke pata karo (usually app-root)
+app-root {
+  display: block;
+  height: 100%;
+  width: 100%;
+}

@@ -1,0 +1,142 @@
+<div class="checkout-page">
+
+  <!-- Step indicator -->
+  <div class="step-indicator">
+    <div class="step-item" *ngFor="let s of steps; let i = index"
+         [class.active]="currentStep() === s.key"
+         [class.done]="steps.findIndex(x => x.key === currentStep()) > i">
+      <span class="step-circle">{{ i + 1 }}</span>
+      <span class="step-label">{{ s.label }}</span>
+    </div>
+  </div>
+
+  <!-- STEP 1: Address -->
+  <section class="checkout-section" *ngIf="currentStep() === 'address'">
+    <h2>Shipping Address</h2>
+
+    <div class="address-grid" *ngIf="addresses().length > 0">
+      <div class="address-card" *ngFor="let addr of addresses()"
+           [class.selected]="selectedAddressId() === addr.addressID"
+           (click)="selectAddress(addr.addressID)">
+        <span class="tag tag-default" *ngIf="addr.isDefault">Default</span>
+        <strong>{{ addr.fullName }}</strong>
+        <p>{{ addr.street }}, {{ addr.city }}, {{ addr.state }}</p>
+        <p>{{ addr.country }} - {{ addr.postalCode }}</p>
+        <p>{{ addr.phoneNumber }}</p>
+      </div>
+    </div>
+
+    <button type="button" class="link-btn" (click)="toggleNewAddressForm()">
+      {{ showNewAddressForm() ? '← Existing address use karein' : '+ Naya address add karein' }}
+    </button>
+
+    <div class="new-address-form" *ngIf="showNewAddressForm()">
+      <div class="form-row">
+        <input type="text" placeholder="Full Name" [(ngModel)]="newAddress.fullName" />
+        <input type="text" placeholder="Phone Number" [(ngModel)]="newAddress.phoneNumber" />
+      </div>
+      <input type="text" placeholder="Street Address" [(ngModel)]="newAddress.street" />
+      <div class="form-row">
+        <input type="text" placeholder="City" [(ngModel)]="newAddress.city" />
+        <input type="text" placeholder="State" [(ngModel)]="newAddress.state" />
+      </div>
+      <div class="form-row">
+        <input type="text" placeholder="Country" [(ngModel)]="newAddress.country" />
+        <input type="text" placeholder="Postal Code" [(ngModel)]="newAddress.postalCode" />
+      </div>
+      <label class="checkbox-row">
+        <input type="checkbox" [(ngModel)]="newAddress.isDefault" />
+        Default address bana dein
+      </label>
+      <button type="button" class="primary-btn" (click)="saveNewAddress()">Address Save Karein</button>
+    </div>
+
+    <div class="step-actions">
+      <button type="button" class="primary-btn" (click)="goToStep('payment')" [disabled]="!selectedAddressId()">
+        Continue to Payment →
+      </button>
+    </div>
+  </section>
+
+  <!-- STEP 2: Payment -->
+  <section class="checkout-section" *ngIf="currentStep() === 'payment'">
+    <h2>Payment Method</h2>
+
+    <div class="payment-options">
+      <div class="payment-card" [class.selected]="selectedPaymentMethod() === 'Cash'" (click)="selectPaymentMethod('Cash')">
+        <strong>Cash on Delivery</strong>
+        <p>Order milne par cash payment karein</p>
+      </div>
+
+      <div class="payment-card disabled" title="Jald aa raha hai">
+        <strong>JazzCash / EasyPaisa</strong>
+        <p>Jald available hoga</p>
+        <span class="tag tag-soon">Coming Soon</span>
+      </div>
+    </div>
+
+    <div class="step-actions">
+      <button type="button" class="secondary-btn" (click)="goToStep('address')">← Back</button>
+      <button type="button" class="primary-btn" (click)="goToStep('review')">Review Order →</button>
+    </div>
+  </section>
+
+  <!-- STEP 3: Review -->
+  <section class="checkout-section" *ngIf="currentStep() === 'review'">
+    <h2>Order Review</h2>
+
+    <div class="review-block">
+      <h4>Shipping To</h4>
+      <p *ngIf="selectedAddress() as addr">
+        {{ addr.fullName }}, {{ addr.street }}, {{ addr.city }}, {{ addr.country }} — {{ addr.phoneNumber }}
+      </p>
+    </div>
+
+    <div class="review-block">
+      <h4>Payment Method</h4>
+      <p>{{ selectedPaymentMethod() === 'Cash' ? 'Cash on Delivery' : selectedPaymentMethod() }}</p>
+    </div>
+
+    <div class="review-block">
+      <h4>Items ({{ cart()?.items?.length || 0 }})</h4>
+      <div class="review-item" *ngFor="let item of cart()?.items">
+        <img [src]="getImageUrl(item.product.imageUrl)" [alt]="item.product.productName" />
+        <div class="review-item-info">
+          <span>{{ item.product.productName }}</span>
+          <span class="qty">Qty: {{ item.quantity }}</span>
+        </div>
+        <span class="review-item-price">${{ item.itemTotal.toFixed(2) }}</span>
+      </div>
+    </div>
+
+    <textarea placeholder="Order notes (optional)" [(ngModel)]="orderNotes" rows="2"></textarea>
+
+    <div class="order-summary">
+      <div class="summary-row"><span>Subtotal</span><span>${{ (cart()?.total || 0).toFixed(2) }}</span></div>
+      <div class="summary-row"><span>Shipping</span><span>{{ shipping() === 0 ? 'Free' : '$' + shipping().toFixed(2) }}</span></div>
+      <div class="summary-row total"><span>Total</span><span>${{ finalTotal().toFixed(2) }}</span></div>
+    </div>
+
+    <div class="step-actions">
+      <button type="button" class="secondary-btn" (click)="goToStep('payment')">← Back</button>
+      <button type="button" class="primary-btn" (click)="placeOrder()" [disabled]="placingOrder()">
+        {{ placingOrder() ? 'Placing Order...' : 'Place Order' }}
+      </button>
+    </div>
+  </section>
+
+  <!-- STEP 4: Confirmation -->
+  <section class="checkout-section confirmation" *ngIf="currentStep() === 'confirmation' && orderResult() as result">
+    <div class="confirmation-icon">✓</div>
+    <h2>Order Confirmed!</h2>
+    <p>Order Number: <strong>{{ result.orderNumber }}</strong></p>
+    <p>Total: <strong>${{ result.finalAmount.toFixed(2) }}</strong></p>
+    <p class="confirmation-note">Aapka order successfully place ho gaya hai.</p>
+
+    <div class="step-actions">
+      <button type="button" class="secondary-btn" (click)="continueShopping()">Continue Shopping</button>
+      <button type="button" class="primary-btn" (click)="goToOrders()">View My Orders</button>
+    </div>
+  </section>
+
+</div>

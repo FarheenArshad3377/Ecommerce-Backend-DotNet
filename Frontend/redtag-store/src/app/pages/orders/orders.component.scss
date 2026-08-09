@@ -1,0 +1,112 @@
+:host {
+  display: block;
+}
+
+.orders-page-wrapper {
+  width: 100%;
+  min-height: 100vh;
+  background: #f7f3ea;
+}
+.orders-page {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 32px 20px;
+  background: #f7f3ea;
+  min-height: 100vh;
+
+  h1 {
+    font-family: Georgia, serif;
+    margin-bottom: 24px;
+    color: #1a1a1a;
+  }
+}
+
+.state-block, .empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: #888;
+}
+
+.primary-btn {
+  display: inline-block;
+  margin-top: 16px;
+  background: #b0223e;
+  color: #fff;
+  padding: 12px 24px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.orders-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.order-card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 18px 20px;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.06);
+}
+
+.order-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+
+  strong { display: block; font-size: 15px; }
+  .order-date { font-size: 12px; color: #888; }
+}
+
+.status-badge {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 12px;
+  text-transform: uppercase;
+
+  &.status-pending { background: #fff3cd; color: #856404; }
+  &.status-confirmed { background: #d1ecf1; color: #0c5460; }
+  &.status-processing { background: #e2d9f3; color: #4b2e83; }
+  &.status-shipped { background: #cfe2ff; color: #084298; }
+  &.status-delivered { background: #d4edda; color: #155724; }
+  &.status-cancelled { background: #f8d7da; color: #721c24; }
+}
+
+.order-card-body {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  color: #555;
+  padding: 8px 0;
+  border-top: 1px solid #f0ede4;
+  border-bottom: 1px solid #f0ede4;
+
+  .order-total { font-weight: 700; color: #b0223e; }
+}
+
+.order-card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 10px;
+  font-size: 13px;
+
+  .payment-info { color: #888; }
+  .order-actions { display: flex; gap: 14px; }
+
+  .text-btn {
+    background: none;
+    border: none;
+    color: #b0223e;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    font-size: 13px;
+
+    &:disabled { opacity: 0.5; cursor: not-allowed; }
+  }
+}

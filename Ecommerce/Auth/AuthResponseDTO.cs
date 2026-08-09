@@ -2,6 +2,7 @@
 {
     public class AuthResponseDTO
     {
+        public int UserId { get; set; }
         public string Token { get; set; }           // JWT Token
         public string Email { get; set; }
         public string FirstName { get; set; }

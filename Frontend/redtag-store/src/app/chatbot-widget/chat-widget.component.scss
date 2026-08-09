@@ -1,0 +1,320 @@
+@use '../../shared/styles/tokens.scss' as *;
+
+.chat-widget {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 999;
+  font-family: $font-body;
+}
+
+// ===== Toggle button =====
+.chat-toggle-btn {
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  background: $red-primary;
+  border: none;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 8px 22px rgba(196, 18, 63, 0.4);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+
+  &:hover {
+    background: $red-deep;
+    box-shadow: 0 10px 28px rgba(196, 18, 63, 0.5);
+  }
+
+  &.swinging {
+    animation: swing 2.6s ease-in-out infinite;
+  }
+}
+
+@keyframes swing {
+  0%, 100% { transform: rotate(0deg); }
+  20% { transform: rotate(-12deg); }
+  40% { transform: rotate(8deg); }
+  60% { transform: rotate(-5deg); }
+  80% { transform: rotate(3deg); }
+}
+
+// ===== Chat panel =====
+.chat-panel {
+  position: absolute;
+  bottom: 68px;
+  right: 0;
+  width: 340px;
+  height: 500px;
+  background: $card-bg;
+  border: 1px solid $border-subtle;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-card;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: pop-in 0.2s ease;
+}
+
+@keyframes pop-in {
+  from { opacity: 0; transform: translateY(10px) scale(0.97); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+// ===== Header — dark, like the reference =====
+.chat-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px;
+  background: $text-light;
+  flex-shrink: 0;
+}
+
+.header-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: $card-bg;
+  color: $red-primary;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.header-text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.header-title {
+  font-family: $font-heading;
+  font-weight: 600;
+  font-size: 15px;
+  color: #fff;
+}
+
+.header-status {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11.5px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.status-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #3EC77A;
+  flex-shrink: 0;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.7);
+  cursor: pointer;
+  display: flex;
+  padding: 2px;
+  transition: color 0.15s ease;
+  &:hover { color: #fff; }
+}
+
+// ===== Body =====
+.chat-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: $black;
+}
+
+.time-divider {
+  text-align: center;
+  font-size: 11.5px;
+  color: $text-muted;
+  margin-bottom: 4px;
+}
+
+.bot-message {
+  align-self: flex-start;
+  background: $black-soft;
+  border-radius: $radius-sm $radius-sm $radius-sm 2px;
+  padding: 10px 14px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: $text-light;
+  max-width: 85%;
+}
+
+.user-message {
+  align-self: flex-end;
+  background: $red-primary;
+  color: #fff;
+  border-radius: $radius-sm $radius-sm 2px $radius-sm;
+  padding: 10px 14px;
+  font-size: 13px;
+  line-height: 1.5;
+  max-width: 85%;
+}
+
+.typing-indicator {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  padding: 12px 14px;
+
+  .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: $text-muted;
+    animation: bounce 1.2s infinite ease-in-out;
+    &:nth-child(2) { animation-delay: 0.15s; }
+    &:nth-child(3) { animation-delay: 0.3s; }
+  }
+}
+
+@keyframes bounce {
+  0%, 60%, 100% { transform: translateY(0); opacity: 0.5; }
+  30% { transform: translateY(-4px); opacity: 1; }
+}
+
+// ===== Product card =====
+.product-card {
+  align-self: flex-start;
+  width: 85%;
+  background: $card-bg;
+  border: 1px solid $border-subtle;
+  border-radius: $radius-sm;
+  overflow: hidden;
+  cursor: pointer;
+  transition: border-color 0.15s ease, transform 0.15s ease;
+
+  &:hover {
+    border-color: $red-primary;
+    transform: translateY(-2px);
+  }
+}
+
+.product-image-wrap {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  background: $black-soft;
+
+  img { width: 100%; height: 100%; object-fit: cover; }
+}
+
+.product-badge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: $red-primary;
+  color: #fff;
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  padding: 3px 8px;
+  border-radius: 4px;
+}
+
+.product-info {
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.product-name {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: $text-light;
+}
+
+.product-price {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: $red-primary;
+}
+
+// ===== Input row =====
+.chat-input-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 14px;
+  border-top: 1px solid $border-subtle;
+  background: $card-bg;
+  flex-shrink: 0;
+}
+
+.attach-btn {
+  background: none;
+  border: none;
+  color: $text-muted;
+  cursor: pointer;
+  display: flex;
+  padding: 4px;
+  flex-shrink: 0;
+  transition: color 0.15s ease;
+  &:hover { color: $red-primary; }
+}
+
+.chat-input-row input {
+  flex: 1;
+  background: $black;
+  border: 1px solid $border-subtle;
+  border-radius: 20px;
+  padding: 9px 14px;
+  color: $text-light;
+  font-size: 13px;
+  outline: none;
+  transition: border-color 0.15s ease;
+
+  &::placeholder { color: $text-muted; }
+  &:focus { border-color: $red-primary; }
+}
+
+.send-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: $red-primary;
+  border: none;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.15s ease, transform 0.15s ease;
+
+  &:hover { background: $red-deep; transform: scale(1.05); }
+}
+
+.chat-footer {
+  text-align: center;
+  font-size: 10.5px;
+  color: $text-muted;
+  padding: 6px 0 10px;
+  background: $card-bg;
+  flex-shrink: 0;
+}
+
+// ===== Responsive =====
+@media (max-width: 480px) {
+  .chat-panel {
+    width: calc(100vw - 32px);
+    height: 70vh;
+    right: -8px;
+  }
+}

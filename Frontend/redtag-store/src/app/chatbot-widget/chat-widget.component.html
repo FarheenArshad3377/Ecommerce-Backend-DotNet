@@ -1,0 +1,86 @@
+<div class="chat-widget">
+
+  <!-- Floating toggle button -->
+  <button class="chat-toggle-btn" [class.swinging]="!isOpen()" (click)="toggleChat()">
+    <svg viewBox="0 0 24 24" width="24" height="24" fill="none" *ngIf="!isOpen()">
+      <rect x="5" y="8" width="14" height="11" rx="3" stroke="currentColor" stroke-width="1.8"/>
+      <circle cx="9.5" cy="13.5" r="1.3" fill="currentColor"/>
+      <circle cx="14.5" cy="13.5" r="1.3" fill="currentColor"/>
+      <path d="M12 8V5m0 0a1.5 1.5 0 100-3 1.5 1.5 0 000 3zM3 12H1m22 0h-2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+    </svg>
+    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" *ngIf="isOpen()">
+      <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+    </svg>
+  </button>
+
+  <!-- Chat panel -->
+  <div class="chat-panel" *ngIf="isOpen()">
+
+    <div class="chat-header">
+      <div class="header-avatar">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none">
+          <rect x="5" y="8" width="14" height="11" rx="3" stroke="currentColor" stroke-width="1.8"/>
+          <circle cx="9.5" cy="13.5" r="1.3" fill="currentColor"/>
+          <circle cx="14.5" cy="13.5" r="1.3" fill="currentColor"/>
+        </svg>
+      </div>
+      <div class="header-text">
+        <span class="header-title">Shop Assistant</span>
+        <span class="header-status"><span class="status-dot"></span>Online</span>
+      </div>
+      <button class="close-btn" (click)="toggleChat()">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none">
+          <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="chat-body">
+      <div class="message-block" *ngFor="let msg of messages">
+
+        <div class="bot-message" *ngIf="msg.type === 'text'">
+          {{ msg.text }}
+        </div>
+
+        <div class="user-message" *ngIf="msg.type === 'quick-reply'">
+          {{ msg.text }}
+        </div>
+
+        <div class="product-card" *ngIf="msg.type === 'product'" (click)="viewProduct(msg.product!.id)">
+          <div class="product-image-wrap">
+          <img [src]="msg.product?.image" [alt]="msg.product?.name" (error)="onImageError($event)" />
+            <span class="product-badge">NEW</span>
+          </div>
+          <div class="product-info">
+            <span class="product-name">{{ msg.product?.name }}</span>
+            <span class="product-price">Rs {{ msg.product?.price }}</span>
+            <span class="view-link">View Product →</span>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="bot-message typing-indicator" *ngIf="loading()">
+        <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+      </div>
+    </div>
+
+    <div class="chat-input-row">
+      <input
+        type="text"
+        placeholder="Please write your question..."
+        [(ngModel)]="userInput"
+        (keyup.enter)="sendMessage()"
+      />
+      <button class="send-btn" (click)="sendMessage()">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none">
+          <path d="M4 12l16-8-6 8 6 8-16-8z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" fill="currentColor"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="chat-footer">Powered by AI</div>
+
+  </div>
+
+</div>

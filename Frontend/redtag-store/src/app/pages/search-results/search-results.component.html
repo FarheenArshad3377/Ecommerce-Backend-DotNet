@@ -1,0 +1,128 @@
+<div class="search-page">
+
+  <header class="header">
+    <a routerLink="/home" class="logo">RedTag <span>Store</span></a>
+    <nav class="nav-links">
+      <a routerLink="/products">Shop</a>
+      <a routerLink="/cart">Cart</a>
+    </nav>
+  </header>
+
+  <main class="search-main">
+
+    <div class="search-summary">
+      <h1>Search results for "{{ query() }}"</h1>
+      <span class="result-count" *ngIf="!loading()">{{ totalResults() }} products found</span>
+    </div>
+
+    <div class="search-layout">
+
+      <!-- Filters sidebar -->
+      <aside class="filters-panel">
+        <div class="filters-header">
+          <h3>Filters</h3>
+          <button type="button" class="clear-filters-btn" *ngIf="activeFilterCount() > 0" (click)="clearFilters()">
+            Clear all ({{ activeFilterCount() }})
+          </button>
+        </div>
+
+        <!-- Category -->
+        <div class="filter-group">
+          <h4>Category</h4>
+          <label class="filter-radio">
+            <input type="radio" name="category" [checked]="selectedCategory() === null" (change)="onCategoryChange(null)" />
+            <span>All Categories</span>
+          </label>
+          <label class="filter-radio" *ngFor="let cat of categoryOptions">
+            <input type="radio" name="category" [checked]="selectedCategory() === cat.id" (change)="onCategoryChange(cat.id)" />
+            <span>{{ cat.label }}</span>
+          </label>
+        </div>
+
+        <!-- Price range -->
+        <div class="filter-group">
+          <h4>Price Range</h4>
+          <div class="price-inputs">
+            <input type="number" placeholder="Min" [(ngModel)]="minPrice" />
+            <span>—</span>
+            <input type="number" placeholder="Max" [(ngModel)]="maxPrice" />
+          </div>
+          <button type="button" class="apply-price-btn" (click)="onPriceApply()">Apply</button>
+        </div>
+
+        <!-- Rating -->
+        <div class="filter-group">
+          <h4>Minimum Rating</h4>
+          <label class="filter-radio" *ngFor="let r of ratingOptions">
+            <input type="radio" name="rating" [checked]="minRating() === r" (change)="onRatingChange(r)" />
+            <span>{{ r }}★ &amp; up</span>
+          </label>
+          <label class="filter-radio">
+            <input type="radio" name="rating" [checked]="minRating() === null" (change)="onRatingChange(null)" />
+            <span>Any rating</span>
+          </label>
+        </div>
+
+        <!-- Stock -->
+        <div class="filter-group">
+          <label class="filter-checkbox">
+            <input type="checkbox" [checked]="inStockOnly()" (change)="onStockToggle()" />
+            <span>In stock only</span>
+          </label>
+        </div>
+      </aside>
+
+      <!-- Results -->
+      <div class="results-panel">
+
+        <div class="results-toolbar">
+          <select class="sort-select" [ngModel]="sortBy()" (ngModelChange)="onSortChange($event)">
+            <option value="newest">Newest</option>
+            <option value="price_asc">Price: Low to High</option>
+            <option value="price_desc">Price: High to Low</option>
+            <option value="rating">Highest Rated</option>
+          </select>
+        </div>
+
+        <div class="state-block" *ngIf="loading()">
+          <div class="spinner"></div>
+          <p>Searching products...</p>
+        </div>
+
+        <div class="state-block error-block" *ngIf="!loading() && error()">
+          <p>{{ error() }}</p>
+        </div>
+
+        <div class="state-block" *ngIf="!loading() && !error() && products().length === 0">
+          <p>Koi product nahi mila. Filters adjust kar ke dobara try karein.</p>
+        </div>
+
+        <div class="product-grid" *ngIf="!loading() && !error() && products().length > 0">
+          <div class="product-card" *ngFor="let product of products()" [routerLink]="['/product', product.productID]" style="cursor:pointer;">
+            <div class="product-image-wrap">
+              <img [src]="getImageUrl(product.imageUrl)" [alt]="product.productName" loading="lazy" />
+              <span class="tag tag-sale" *ngIf="hasDiscount(product)">SALE</span>
+            </div>
+            <div class="product-info">
+              <h3>{{ product.productName }}</h3>
+              <div class="product-footer">
+                <div class="price-block">
+                  <span class="price">${{ displayPrice(product) }}</span>
+                  <span class="price-old" *ngIf="hasDiscount(product)">${{ product.price.toFixed(2) }}</span>
+                </div>
+                <button class="add-cart-btn" (click)="addToCart(product); $event.stopPropagation()" [disabled]="product.stock === 0">
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none">
+                    <circle cx="9" cy="21" r="1.4" fill="currentColor"/>
+                    <circle cx="18" cy="21" r="1.4" fill="currentColor"/>
+                    <path d="M2 3h2l2.4 12.4a2 2 0 002 1.6h8.2a2 2 0 002-1.6L21 7H6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </main>
+</div>

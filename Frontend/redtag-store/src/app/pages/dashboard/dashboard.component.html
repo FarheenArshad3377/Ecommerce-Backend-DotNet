@@ -1,0 +1,99 @@
+<div class="dashboard-layout">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none">
+        <path d="M12 2l2.5 5 5.5.8-4 3.9.9 5.5-4.9-2.6-4.9 2.6.9-5.5-4-3.9 5.5-.8L12 2z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+      </svg>
+      RedTag Store
+    </div>
+
+    <nav class="sidebar-nav">
+      <a *ngFor="let item of navItems"
+         [routerLink]="item.route"
+         routerLinkActive="active"
+         class="nav-item">
+        <span class="nav-icon" [innerHTML]="item.icon"></span>
+        {{ item.label }}
+      </a>
+    </nav>
+
+    <button class="logout-btn" (click)="logout()">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none">
+        <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      Logout
+    </button>
+  </aside>
+
+  <!-- Main content -->
+  <main class="main-content">
+    <h1 class="page-title">My Dashboard</h1>
+    <p class="page-subtitle">Manage your account, orders, and preferences.</p>
+
+    <!-- Top cards -->
+    <div class="cards-row">
+
+      <!-- Profile card -->
+      <div class="card profile-card">
+        <img class="avatar" [src]="user.avatar" [alt]="user.name" />
+        <h3 class="profile-name">{{ user.name }}</h3>
+        <p class="profile-email">{{ user.email }}</p>
+        <button class="edit-btn" routerLink="/dashboard/settings">Edit Profile</button>
+      </div>
+
+      <!-- Stat cards -->
+      <div class="card stat-card" *ngFor="let stat of stats">
+        <div class="stat-header">
+          <span>{{ stat.label }}</span>
+          <span class="stat-icon" [innerHTML]="stat.icon"></span>
+        </div>
+        <div class="stat-value">{{ stat.value }}</div>
+      </div>
+
+    </div>
+
+    <!-- Recent orders -->
+    <div class="section-header">
+      <h2>Recent Orders</h2>
+      <a routerLink="/dashboard/orders" class="view-all">
+        View All
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none">
+          <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </a>
+    </div>
+
+    <div class="orders-table">
+      <div class="table-header">
+        <span>Order ID</span>
+        <span>Date</span>
+        <span>Total</span>
+        <span>Status</span>
+        <span class="col-action">Action</span>
+      </div>
+
+      <div class="table-row" *ngFor="let order of recentOrders">
+        <span class="order-id">{{ order.id }}</span>
+        <span class="order-date">{{ order.date }}</span>
+        <span class="order-total">${{ order.total.toFixed(2) }}</span>
+        <span>
+          <span class="status-badge" [ngClass]="'status-' + order.status.toLowerCase()">
+            {{ order.status }}
+          </span>
+        </span>
+        <span class="col-action">
+          <button class="action-btn" (click)="toggleActionMenu(order.id)">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none">
+              <circle cx="12" cy="5" r="1.6" fill="currentColor"/>
+              <circle cx="12" cy="12" r="1.6" fill="currentColor"/>
+              <circle cx="12" cy="19" r="1.6" fill="currentColor"/>
+            </svg>
+          </button>
+        </span>
+      </div>
+    </div>
+
+  </main>
+</div>

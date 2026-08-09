@@ -1,0 +1,100 @@
+<div class="auth-page">
+  <div class="glow glow-top"></div>
+  <div class="glow glow-bottom"></div>
+
+  <div class="auth-card">
+    <h1 class="brand">RedTag <span>Store</span></h1>
+    <p class="subtitle">Create an account to unlock premium value.</p>
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="auth-form">
+
+      <div class="field">
+        <label for="fullName">Full Name</label>
+        <div class="input-wrap">
+          <svg class="icon" viewBox="0 0 24 24" width="16" height="16" fill="none">
+            <path d="M12 12a4 4 0 100-8 4 4 0 000 8zM4 20c0-3.3 3.6-6 8-6s8 2.7 8 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+          </svg>
+          <input id="fullName" type="text" formControlName="fullName" placeholder="John Doe" autocomplete="name" />
+        </div>
+        <span class="error" *ngIf="form.get('fullName')?.touched && form.get('fullName')?.invalid">
+          Naam kam se kam 2 characters ka hona chahiye
+        </span>
+      </div>
+
+      <div class="field">
+        <label for="email">Email Address</label>
+        <div class="input-wrap">
+          <svg class="icon" viewBox="0 0 24 24" width="16" height="16" fill="none">
+            <path d="M3 6h18v12H3V6zm0 0l9 7 9-7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <input id="email" type="email" formControlName="email" placeholder="john@example.com" autocomplete="email" />
+        </div>
+        <span class="error" *ngIf="form.get('email')?.touched && form.get('email')?.invalid">
+          Sahi email address likhein
+        </span>
+      </div>
+
+      <div class="field">
+        <label for="password">Password</label>
+        <div class="input-wrap">
+          <svg class="icon" viewBox="0 0 24 24" width="16" height="16" fill="none">
+            <rect x="5" y="11" width="14" height="9" rx="2" stroke="currentColor" stroke-width="1.8"/>
+            <path d="M8 11V8a4 4 0 018 0v3" stroke="currentColor" stroke-width="1.8"/>
+          </svg>
+          <input [type]="showPassword() ? 'text' : 'password'" id="password" formControlName="password" placeholder="••••••••" autocomplete="new-password" />
+          <button type="button" class="toggle-eye" (click)="togglePassword()">
+            {{ showPassword() ? '🙈' : '👁' }}
+          </button>
+        </div>
+        <span class="error" *ngIf="form.get('password')?.touched && form.get('password')?.invalid">
+          Kam se kam 6 characters chahiye
+        </span>
+      </div>
+
+      <div class="field">
+        <label for="confirmPassword">Confirm Password</label>
+        <div class="input-wrap">
+          <svg class="icon" viewBox="0 0 24 24" width="16" height="16" fill="none">
+            <path d="M4 12a8 8 0 0113.66-5.66M20 12a8 8 0 01-13.66 5.66" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+          </svg>
+          <input [type]="showConfirmPassword() ? 'text' : 'password'" id="confirmPassword" formControlName="confirmPassword" placeholder="••••••••" autocomplete="new-password" />
+          <button type="button" class="toggle-eye" (click)="toggleConfirmPassword()">
+            {{ showConfirmPassword() ? '🙈' : '👁' }}
+          </button>
+        </div>
+        <span class="error" *ngIf="form.get('confirmPassword')?.touched && form.errors?.['mismatch']">
+          Passwords match nahi kar rahe
+        </span>
+      </div>
+
+      <!-- <label class="checkbox-row">
+        <input type="checkbox" formControlName="agreeTerms" />
+        <span>I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a></span>
+      </label> -->
+
+      <div class="error form-error" *ngIf="errorMessage()">{{ errorMessage() }}</div>
+
+      <button type="submit" class="submit-btn" [disabled]="isSubmitting()">
+        {{ isSubmitting() ? 'Creating account...' : 'Create Account' }}
+      </button>
+    </form>
+
+    <p class="footer-link">Already have an account? <a routerLink="/login">Log In</a></p>
+  </div>
+
+  <!-- Success Popup -->
+  <div class="success-overlay" *ngIf="showSuccess()">
+    <div class="success-popup">
+      <div class="success-icon">
+        <svg viewBox="0 0 24 24" width="40" height="40" fill="none">
+          <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+          <path d="M8 12.5l2.5 2.5L16 9" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <h2>Account Created!</h2>
+      <p>Aapka account successfully ban gaya hai. Ab aap login kar sakte hain.</p>
+      <button class="success-btn" (click)="goToLogin()">Continue</button>
+    </div>
+  </div>
+
+</div>
