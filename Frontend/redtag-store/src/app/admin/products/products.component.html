@@ -1,0 +1,44 @@
+<div class="admin-page-container">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Manage Products</h1>
+      <p class="page-subtitle">Apne store ke saare products yahan se control karein.</p>
+    </div>
+    <button class="add-btn">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="12" y1="5" x2="12" y2="19"></line>
+        <line x1="5" y1="12" x2="19" y2="12"></line>
+      </svg>
+      Add New Product
+    </button>
+  </div>
+
+  <div class="table-container">
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th>Image</th>
+          <th>Product Name</th>
+          <th>Price</th>
+          <th>Stock</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Dummy Row: Jab aap real service integrate karenge to yahan *ngFor lag jayega -->
+        <tr>
+          <td><div class="img-placeholder"></div></td>
+          <td><strong class="item-name">Sample T-Shirt</strong></td>
+          <td>PKR 1,500</td>
+          <td><span class="status-badge status-delivered">In Stock (45)</span></td>
+          <td>
+            <div class="action-actions">
+              <button class="icon-btn edit">Edit</button>
+              <button class="icon-btn delete">Delete</button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

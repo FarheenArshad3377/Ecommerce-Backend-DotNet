@@ -107,16 +107,17 @@
       <div class="carousel-slide"
            *ngFor="let slide of heroSlides(); let i = index"
            [class.active]="i === activeSlide()">
-        <div class="slide-text">
-          <h1 class="hero-title">{{ slide.title }}</h1>
-          <p class="hero-subtitle">{{ slide.subtitle }}</p>
-          <!-- <button class="shop-now-btn" [routerLink]="slide.ctaLink">
-            Shop Now
-            <svg viewBox="0 0 24 24" width="16" height="16" fill="none">
-              <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </button> -->
-        </div>
+       <div class="slide-text">
+  <span class="slide-eyebrow">Featured Collection</span>
+  <h1 class="hero-title">{{ slide.title }}</h1>
+  <p class="hero-subtitle">{{ slide.subtitle }}</p>
+  <button class="shop-now-btn" [routerLink]="slide.ctaLink">
+    Shop Now
+    <svg viewBox="0 0 24 24" width="16" height="16" fill="none">
+      <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </button>
+</div>
         <div class="slide-image">
           <img [src]="slide.imageUrl" [alt]="slide.title" />
         </div>
@@ -164,41 +165,27 @@
   </section>
 
   <!-- Trending — multiple categories se mixed data, single scrollable row -->
-  <section class="scroll-section trending-section">
-    <div class="scroll-header">
-      <h2>Trending Now</h2>
-      <div class="scroll-controls">
-        <button type="button" (click)="trendingScrollLeft()" aria-label="Scroll left">
-          <svg viewBox="0 0 24 24" width="18" height="18" fill="none"><path d="M15 6l-6 6 6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </button>
-        <button type="button" (click)="trendingScrollRight()" aria-label="Scroll right">
-          <svg viewBox="0 0 24 24" width="18" height="18" fill="none"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </button>
-        <!-- <a routerLink="/products" class="view-all">
-          View All
-          <svg viewBox="0 0 24 24" width="14" height="14" fill="none">
-            <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </a> -->
+<section class="scroll-section trending-section">
+  <div class="scroll-header">
+    <h2>Trending Now</h2>
+  </div>
+
+  <div class="state-block" *ngIf="sectionsLoading()">
+    <div class="spinner"></div>
+    <p>Waiting for products...</p>
+  </div>
+
+  <div class="scroll-row" #trendingRow *ngIf="!sectionsLoading() && trendingMixed().length > 0">
+    <a class="scroll-card" *ngFor="let product of trendingMixed()" [routerLink]="['/product', product.productID]">
+      <div class="scroll-card-img-wrap">
+        <img [src]="getImageUrl(product.imageUrl)" [alt]="product.productName" loading="lazy" />
+        <span class="tag tag-sale" *ngIf="hasDiscount(product)">SALE</span>
       </div>
-    </div>
-
-    <div class="state-block" *ngIf="sectionsLoading()">
-      <div class="spinner"></div>
-      <p>Waiting for products...</p>
-    </div>
-
-    <div class="scroll-row" #trendingRow *ngIf="!sectionsLoading() && trendingMixed().length > 0">
-      <a class="scroll-card" *ngFor="let product of trendingMixed()" [routerLink]="['/product', product.productID]">
-        <div class="scroll-card-img-wrap">
-          <img [src]="getImageUrl(product.imageUrl)" [alt]="product.productName" loading="lazy" />
-          <span class="tag tag-sale" *ngIf="hasDiscount(product)">SALE</span>
-        </div>
-        <span class="scroll-card-name">{{ product.productName }}</span>
-        <span class="scroll-card-price">${{ displayPrice(product) }}</span>
-      </a>
-    </div>
-  </section>
+      <span class="scroll-card-name">{{ product.productName }}</span>
+      <span class="scroll-card-price">${{ displayPrice(product) }}</span>
+    </a>
+  </div>
+</section>
 <!-- Recently Viewed — sirf logged-in users ke liye -->
 <section class="scroll-section recently-viewed-section" *ngIf="isLoggedIn() && !recentlyViewedLoading() && recentlyViewed().length > 0">
   <div class="scroll-header">
@@ -225,31 +212,23 @@
   </div>
 </section>
   <!-- Horizontal scroll row: "You Might Also Like" -->
-  <section class="scroll-section" *ngIf="!loading() && products().length > 0">
-    <div class="scroll-header">
-      <h2>You Might Also Like</h2>
-      <div class="scroll-controls">
-        <button type="button" (click)="scrollLeft()" aria-label="Scroll left">
-          <svg viewBox="0 0 24 24" width="18" height="18" fill="none"><path d="M15 6l-6 6 6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </button>
-        <button type="button" (click)="scrollRight()" aria-label="Scroll right">
-          <svg viewBox="0 0 24 24" width="18" height="18" fill="none"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </button>
-      </div>
-    </div>
+<section class="scroll-section" *ngIf="!loading() && products().length > 0">
+  <div class="scroll-header">
+    <h2>You Might Also Like</h2>
+  </div>
 
-    <div class="scroll-row" #scrollRow>
-      <a class="scroll-card"
-         *ngFor="let product of products()"
-         [routerLink]="['/product', product.productID]">
-        <div class="scroll-card-img-wrap">
-          <img [src]="getImageUrl(product.imageUrl)" [alt]="product.productName" loading="lazy" />
-        </div>
-        <span class="scroll-card-name">{{ product.productName }}</span>
-        <span class="scroll-card-price">${{ displayPrice(product) }}</span>
-      </a>
-    </div>
-  </section>
+  <div class="scroll-row" #scrollRow>
+    <a class="scroll-card"
+       *ngFor="let product of products()"
+       [routerLink]="['/product', product.productID]">
+      <div class="scroll-card-img-wrap">
+        <img [src]="getImageUrl(product.imageUrl)" [alt]="product.productName" loading="lazy" />
+      </div>
+      <span class="scroll-card-name">{{ product.productName }}</span>
+      <span class="scroll-card-price">${{ displayPrice(product) }}</span>
+    </a>
+  </div>
+</section>
 
   <!-- Footer -->
   <footer class="footer">

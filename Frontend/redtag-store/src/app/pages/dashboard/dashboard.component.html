@@ -6,7 +6,7 @@
       <svg viewBox="0 0 24 24" width="20" height="20" fill="none">
         <path d="M12 2l2.5 5 5.5.8-4 3.9.9 5.5-4.9-2.6-4.9 2.6.9-5.5-4-3.9 5.5-.8L12 2z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
       </svg>
-      RedTag Store
+      RedTag Admin
     </div>
 
     <nav class="sidebar-nav">
@@ -29,71 +29,101 @@
 
   <!-- Main content -->
   <main class="main-content">
-    <h1 class="page-title">My Dashboard</h1>
-    <p class="page-subtitle">Manage your account, orders, and preferences.</p>
+    <h1 class="page-title">Admin Dashboard</h1>
+    <p class="page-subtitle">Poore store ka overview — products, orders, reviews aur revenue.</p>
 
-    <!-- Top cards -->
-    <div class="cards-row">
+    <!-- Loading state -->
+    <div *ngIf="loading" class="page-subtitle">Loading dashboard...</div>
 
-      <!-- Profile card -->
-      <div class="card profile-card">
-        <img class="avatar" [src]="user.avatar" [alt]="user.name" />
-        <h3 class="profile-name">{{ user.name }}</h3>
-        <p class="profile-email">{{ user.email }}</p>
-        <button class="edit-btn" routerLink="/dashboard/settings">Edit Profile</button>
-      </div>
+    <!-- Error state -->
+    <div *ngIf="error" class="page-subtitle" style="color:#FF6B6B">{{ error }}</div>
 
-      <!-- Stat cards -->
-      <div class="card stat-card" *ngFor="let stat of stats">
-        <div class="stat-header">
-          <span>{{ stat.label }}</span>
-          <span class="stat-icon" [innerHTML]="stat.icon"></span>
+    <!-- Bypass strict null check: loading false hotay hi render karein -->
+    <ng-container *ngIf="!loading">
+
+      <!-- Top stat cards -->
+    <!-- Top stat cards -->
+      <div class="cards-row">
+        <div class="card stat-card">
+          <div class="stat-header"><span>Total Revenue</span></div>
+          <!-- Safe navigation with || fallback -->
+          <div class="stat-value">{{ (stats?.totalRevenue) | currency:'PKR':'symbol':'1.0-2' }}</div>
         </div>
-        <div class="stat-value">{{ stat.value }}</div>
+        <div class="card stat-card">
+          <div class="stat-header"><span>Total Orders</span></div>
+          <div class="stat-value">{{ stats?.totalOrders || 0 }}</div>
+        </div>
+        <div class="card stat-card">
+          <div class="stat-header"><span>Total Products</span></div>
+          <div class="stat-value">{{ stats?.totalProducts || 0 }}</div>
+        </div>
+        <div class="card stat-card">
+          <div class="stat-header"><span>Total Users</span></div>
+          <div class="stat-value">{{ stats?.totalUsers || 0 }}</div>
+        </div>
+      </div>
+      <!-- Secondary stat cards -->
+     <!-- Secondary stat cards -->
+      <div class="cards-row">
+        <div class="card stat-card">
+          <div class="stat-header"><span>Pending Orders</span></div>
+          <div class="stat-value">{{ stats?.pendingOrders || 0 }}</div>
+        </div>
+        <div class="card stat-card">
+          <div class="stat-header"><span>Low Stock Products</span></div>
+          <div class="stat-value">{{ stats?.lowStockProducts || 0 }}</div>
+        </div>
+        <div class="card stat-card">
+          <div class="stat-header"><span>Avg Rating</span></div>
+          <div class="stat-value">{{ (stats?.averageRating || 0) | number:'1.1-1' }} ★</div>
+        </div>
+        <div class="card stat-card">
+          <div class="stat-header"><span>Pending Reviews</span></div>
+          <div class="stat-value">{{ stats?.pendingReviewsCount || 0 }}</div>
+        </div>
       </div>
 
-    </div>
-
-    <!-- Recent orders -->
-    <div class="section-header">
-      <h2>Recent Orders</h2>
-      <a routerLink="/dashboard/orders" class="view-all">
-        View All
-        <svg viewBox="0 0 24 24" width="14" height="14" fill="none">
-          <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </a>
-    </div>
-
-    <div class="orders-table">
-      <div class="table-header">
-        <span>Order ID</span>
-        <span>Date</span>
-        <span>Total</span>
-        <span>Status</span>
-        <span class="col-action">Action</span>
+      <!-- Recent Orders Table -->
+      <div class="section-header">
+        <h2>Recent Orders</h2>
+        <a routerLink="/admin/orders" class="view-all">
+          View All
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none">
+            <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </a>
       </div>
 
-      <div class="table-row" *ngFor="let order of recentOrders">
-        <span class="order-id">{{ order.id }}</span>
-        <span class="order-date">{{ order.date }}</span>
-        <span class="order-total">${{ order.total.toFixed(2) }}</span>
-        <span>
-          <span class="status-badge" [ngClass]="'status-' + order.status.toLowerCase()">
-            {{ order.status }}
+      <div class="orders-table">
+        <div class="table-header">
+          <span>Order #</span>
+          <span>Customer</span>
+          <span>Total</span>
+          <span>Status</span>
+          <span class="col-action">Action</span>
+        </div>
+
+        <div class="table-row" *ngFor="let order of stats?.recentOrders">
+  <span class="order-id">{{ order?.orderNumber }}</span>
+  <span class="order-date">{{ order?.customerName }}</span>
+  <span class="order-total">{{ order?.totalAmount | currency:'PKR' }}</span>
+          <span>
+            <span class="status-badge" [ngClass]="getStatusClass(order.status || order.status || '')">
+              {{ order.status || order.status || 'Unknown' }}
+            </span>
           </span>
-        </span>
-        <span class="col-action">
-          <button class="action-btn" (click)="toggleActionMenu(order.id)">
-            <svg viewBox="0 0 24 24" width="16" height="16" fill="none">
-              <circle cx="12" cy="5" r="1.6" fill="currentColor"/>
-              <circle cx="12" cy="12" r="1.6" fill="currentColor"/>
-              <circle cx="12" cy="19" r="1.6" fill="currentColor"/>
-            </svg>
-          </button>
-        </span>
+          <span class="col-action">
+            <button class="action-btn" [routerLink]="['/admin/orders', order.id || order.id]">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none">
+                <circle cx="12" cy="5" r="1.6" fill="currentColor"/>
+                <circle cx="12" cy="12" r="1.6" fill="currentColor"/>
+                <circle cx="12" cy="19" r="1.6" fill="currentColor"/>
+              </svg>
+            </button>
+          </span>
+        </div>
       </div>
-    </div>
 
+    </ng-container>
   </main>
 </div>

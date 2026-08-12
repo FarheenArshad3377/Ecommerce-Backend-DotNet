@@ -1,7 +1,16 @@
+<app-header></app-header>
+
 <div class="category-page">
 
+  <div class="breadcrumb">
+    <a routerLink="/">Home</a>
+    <span class="sep">/</span>
+    <span class="current">{{ categorySlug() | titlecase }}</span>
+  </div>
+
   <div *ngIf="notAvailable()" class="state-block">
-    <p>Ye category jald hi aa rahi hai.</p>
+    <p>This category is coming soon.</p>
+    <a routerLink="/" class="back-home-link">← Back to Home</a>
   </div>
 
   <ng-container *ngIf="!notAvailable()">
@@ -15,7 +24,7 @@
 
     <div class="state-block" *ngIf="loading()">
       <div class="spinner"></div>
-      <p>Products load ho rahe hain...</p>
+      <p>Loading products...</p>
     </div>
 
     <div class="state-block error-block" *ngIf="!loading() && error()">
@@ -59,8 +68,11 @@
     </div>
 
     <div class="state-block" *ngIf="!loading() && !error() && products().length === 0">
-      <p>Is category me abhi products nahi hain.</p>
+      <p>No products in this category yet.</p>
+      <a routerLink="/" class="back-home-link">← Back to Home</a>
     </div>
 
   </ng-container>
 </div>
+
+<app-footer></app-footer>

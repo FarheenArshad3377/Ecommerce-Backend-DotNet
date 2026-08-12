@@ -11,10 +11,13 @@
           <svg class="icon" viewBox="0 0 24 24" width="16" height="16" fill="none">
             <path d="M3 6h18v12H3V6zm0 0l9 7 9-7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
-          <input id="email" type="email" formControlName="email" placeholder="Enter your email" />
+          <input id="email" type="email" formControlName="email" placeholder="Enter your email" autocomplete="email" />
         </div>
-        <span class="error" *ngIf="form.get('email')?.touched && form.get('email')?.invalid">
-          Sahi email address likhein
+        <span class="error" *ngIf="form.get('email')?.touched && form.get('email')?.hasError('required')">
+          Email address is required
+        </span>
+        <span class="error" *ngIf="form.get('email')?.touched && form.get('email')?.hasError('email')">
+          Please enter a valid email address
         </span>
       </div>
 
@@ -28,17 +31,15 @@
             <rect x="5" y="11" width="14" height="9" rx="2" stroke="currentColor" stroke-width="1.8"/>
             <path d="M8 11V8a4 4 0 018 0v3" stroke="currentColor" stroke-width="1.8"/>
           </svg>
-          <input [type]="showPassword() ? 'text' : 'password'" id="password" formControlName="password" placeholder="Enter your password" />
-          <button type="button" class="toggle-eye" (click)="togglePassword()">
+          <input [type]="showPassword() ? 'text' : 'password'" id="password" formControlName="password" placeholder="Enter your password" autocomplete="current-password" />
+          <button type="button" class="toggle-eye" (click)="togglePassword()" [attr.aria-label]="showPassword() ? 'Hide password' : 'Show password'">
             {{ showPassword() ? '🙈' : '👁' }}
           </button>
         </div>
         <span class="error" *ngIf="form.get('password')?.touched && form.get('password')?.invalid">
-          Password zaroori hai
+          Password is required
         </span>
       </div>
-
-      <div class="error form-error" *ngIf="errorMessage()">{{ errorMessage() }}</div>
 
       <button type="submit" class="submit-btn" [disabled]="isSubmitting()">
         {{ isSubmitting() ? 'Logging in...' : 'Log In' }}
@@ -49,5 +50,12 @@
     </form>
 
     <p class="footer-link">Don't have an account? <a routerLink="/signup">Sign Up</a></p>
+  </div>
+
+  <!-- Backend error toast -->
+  <div class="error-toast" *ngIf="errorMessage()">
+    <span class="toast-icon">⚠</span>
+    <span class="toast-text">{{ errorMessage() }}</span>
+    <button type="button" class="toast-close" (click)="dismissError()" aria-label="Dismiss">✕</button>
   </div>
 </div>

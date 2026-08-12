@@ -17,7 +17,7 @@
           <input id="fullName" type="text" formControlName="fullName" placeholder="John Doe" autocomplete="name" />
         </div>
         <span class="error" *ngIf="form.get('fullName')?.touched && form.get('fullName')?.invalid">
-          Naam kam se kam 2 characters ka hona chahiye
+          please enter your full name
         </span>
       </div>
 
@@ -30,7 +30,7 @@
           <input id="email" type="email" formControlName="email" placeholder="john@example.com" autocomplete="email" />
         </div>
         <span class="error" *ngIf="form.get('email')?.touched && form.get('email')?.invalid">
-          Sahi email address likhein
+          please enter a valid email address
         </span>
       </div>
 
@@ -41,13 +41,41 @@
             <rect x="5" y="11" width="14" height="9" rx="2" stroke="currentColor" stroke-width="1.8"/>
             <path d="M8 11V8a4 4 0 018 0v3" stroke="currentColor" stroke-width="1.8"/>
           </svg>
-          <input [type]="showPassword() ? 'text' : 'password'" id="password" formControlName="password" placeholder="••••••••" autocomplete="new-password" />
+          <input
+            [type]="showPassword() ? 'text' : 'password'"
+            id="password"
+            formControlName="password"
+            placeholder="••••••••"
+            autocomplete="new-password"
+            (focus)="onPasswordFocus()"
+            (blur)="onPasswordBlur()"
+          />
           <button type="button" class="toggle-eye" (click)="togglePassword()">
             {{ showPassword() ? '🙈' : '👁' }}
           </button>
         </div>
-        <span class="error" *ngIf="form.get('password')?.touched && form.get('password')?.invalid">
-          Kam se kam 6 characters chahiye
+
+        <!-- Live requirements checklist -->
+        <div class="password-checklist" *ngIf="passwordFocused() && !passwordAllValid()">
+          <div class="check-item" [class.met]="passwordRequirements().hasMinLen">
+            <span class="dot">{{ passwordRequirements().hasMinLen ? '✓' : '•' }}</span> Kam se kam 8 characters
+          </div>
+          <div class="check-item" [class.met]="passwordRequirements().hasUpper">
+            <span class="dot">{{ passwordRequirements().hasUpper ? '✓' : '•' }}</span> Ek uppercase letter (A–Z)
+          </div>
+          <div class="check-item" [class.met]="passwordRequirements().hasLower">
+            <span class="dot">{{ passwordRequirements().hasLower ? '✓' : '•' }}</span> Ek lowercase letter (a–z)
+          </div>
+          <div class="check-item" [class.met]="passwordRequirements().hasNumber">
+            <span class="dot">{{ passwordRequirements().hasNumber ? '✓' : '•' }}</span> Ek number (0–9)
+          </div>
+          <div class="check-item" [class.met]="passwordRequirements().hasSpecial">
+            <span class="dot">{{ passwordRequirements().hasSpecial ? '✓' : '•' }}</span> Ek special character (!@#$...)
+          </div>
+        </div>
+
+        <span class="error" *ngIf="form.get('password')?.touched && form.get('password')?.hasError('weakPassword') && !passwordFocused()">
+          Password is too weak. please follow the requirements above.
         </span>
       </div>
 
@@ -63,16 +91,9 @@
           </button>
         </div>
         <span class="error" *ngIf="form.get('confirmPassword')?.touched && form.errors?.['mismatch']">
-          Passwords match nahi kar rahe
+          Passwords does not match
         </span>
       </div>
-
-      <!-- <label class="checkbox-row">
-        <input type="checkbox" formControlName="agreeTerms" />
-        <span>I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a></span>
-      </label> -->
-
-      <div class="error form-error" *ngIf="errorMessage()">{{ errorMessage() }}</div>
 
       <button type="submit" class="submit-btn" [disabled]="isSubmitting()">
         {{ isSubmitting() ? 'Creating account...' : 'Create Account' }}
@@ -80,6 +101,13 @@
     </form>
 
     <p class="footer-link">Already have an account? <a routerLink="/login">Log In</a></p>
+  </div>
+
+  <!-- Backend error toast -->
+  <div class="error-toast" *ngIf="errorMessage()">
+    <span class="toast-icon">⚠</span>
+    <span class="toast-text">{{ errorMessage() }}</span>
+    <button type="button" class="toast-close" (click)="dismissError()">✕</button>
   </div>
 
   <!-- Success Popup -->
@@ -92,7 +120,7 @@
         </svg>
       </div>
       <h2>Account Created!</h2>
-      <p>Aapka account successfully ban gaya hai. Ab aap login kar sakte hain.</p>
+      <p>Your account has been created successfully. You can now log in.</p>
       <button class="success-btn" (click)="goToLogin()">Continue</button>
     </div>
   </div>

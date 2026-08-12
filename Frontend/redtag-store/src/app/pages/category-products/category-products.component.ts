@@ -7,11 +7,13 @@ import { CartService } from '../../../store/services/cart.service';
 import { ToastService } from '../../../store/services/toast.service';
 import { CATEGORY_SLUG_MAP } from '../../../store/services/category-slug-map';
 import { environment } from '../../../environments/environment';
+import { AppFooterComponent } from "../../../components/footer/app-footer.component";
+import { AppHeaderComponent } from "../../../components/header/app-header.component";
 
 @Component({
   selector: 'app-category-products',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, AppFooterComponent, AppHeaderComponent],
   templateUrl: './category-products.component.html',
   styleUrl: './category-products.component.scss'
 })

@@ -1,5 +1,5 @@
 @use '../../shared/styles/tokens.scss' as *;
-
+html, body { background: #000; }
 .chat-widget {
   position: fixed;
   bottom: 24px;

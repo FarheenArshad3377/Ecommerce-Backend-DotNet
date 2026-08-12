@@ -29,7 +29,7 @@
   <!-- Loading -->
   <div class="state-block" *ngIf="loading()">
     <div class="spinner"></div>
-    <p>Product load ho raha hai...</p>
+    <p>Please Wait For the Product to Load...</p>
   </div>
 
   <!-- Error -->
@@ -123,15 +123,15 @@
         <p>{{ p.productName }} — {{ p.category }} category ka premium product, jo quality aur value dono provide karta hai.</p>
       </div>
 
-      <div class="tab-content" *ngIf="activeTab() === 'reviews'">
+      <!-- <div class="tab-content" *ngIf="activeTab() === 'reviews'">
         <p class="placeholder-text">
           {{ p.totalReviews > 0 ? p.totalReviews + ' reviews, average rating ' + p.averageRating.toFixed(1) : 'Abhi koi review nahi hai.' }}
         </p>
-      </div>
+      </div> -->
 
-      <div class="tab-content" *ngIf="activeTab() === 'shipping'">
+      <!-- <div class="tab-content" *ngIf="activeTab() === 'shipping'">
         <p class="placeholder-text">Free shipping available. Delivery time 3-5 business days.</p>
-      </div>
+      </div> -->
     </div>
   </main>
 
@@ -149,5 +149,57 @@
       </nav>
     </div>
   </footer>
+<!-- Added to Cart confirmation modal -->
+  <div class="modal-overlay" *ngIf="showAddedModal()" (click)="closeAddedModal()">
+    <div class="added-modal" (click)="$event.stopPropagation()">
+      <button class="modal-close-x" (click)="closeAddedModal()" aria-label="Close">✕</button>
 
+      <div class="added-icon">
+        <svg viewBox="0 0 24 24" width="28" height="28" fill="none">
+          <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+          <path d="M8 12.5l2.5 2.5L16 9" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+
+      <h3 class="added-title">Added to Cart</h3>
+
+      <div class="added-product" *ngIf="product() as p">
+        <div class="added-product-img">
+          <img [src]="getMainImage()" [alt]="p.productName" />
+        </div>
+        <div class="added-product-info">
+          <span class="added-product-name">{{ p.productName }}</span>
+          <span class="added-product-meta">Qty: {{ qty() }} · ${{ formatPrice(hasDiscount() ? p.discountPrice : p.price) }}</span>
+        </div>
+      </div>
+
+      <div class="added-actions">
+        <button class="added-btn-secondary" (click)="continueShopping()">Continue Shopping</button>
+        <button class="added-btn-primary" (click)="goToCart()">View Cart</button>
+      </div>
+    </div>
+  </div>
+  <!-- Login required modal -->
+<div class="modal-overlay" *ngIf="showLoginPrompt()" (click)="closeLoginPrompt()">
+  <div class="added-modal" (click)="$event.stopPropagation()">
+    <button class="modal-close-x" (click)="closeLoginPrompt()" aria-label="Close">✕</button>
+
+    <div class="added-icon">
+      <svg viewBox="0 0 24 24" width="26" height="26" fill="none">
+        <circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="1.8"/>
+        <path d="M4 20c0-3.3 3.6-6 8-6s8 2.7 8 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+      </svg>
+    </div>
+
+    <h3 class="added-title">Please Log In</h3>
+    <p style="color: var(--text-muted); font-size: 13.5px; margin: 0 0 22px; line-height: 1.5;">
+      You need to be logged in to add items to your cart.
+    </p>
+
+    <div class="added-actions">
+      <button class="added-btn-secondary" (click)="closeLoginPrompt()">Cancel</button>
+      <button class="added-btn-primary" (click)="goToLogin()">Log In</button>
+    </div>
+  </div>
+</div>
 </div>

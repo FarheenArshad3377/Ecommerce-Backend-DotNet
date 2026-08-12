@@ -4,6 +4,7 @@ import { catchError, map, of, switchMap, tap } from 'rxjs';
 import { Router } from '@angular/router';
 import { AuthActions } from './auth.actions';
 import { AuthService } from './auth.service';
+import { jwtDecode } from 'jwt-decode';
 
 @Injectable()
 export class AuthEffects {
@@ -44,8 +45,35 @@ export class AuthEffects {
       this.actions$.pipe(
         ofType(AuthActions.registerSuccess, AuthActions.loginSuccess),
         tap(({ response }) => {
+          // 💾 Safe key synchronization inside storage
           localStorage.setItem('token', response.token);
-          this.router.navigate(['/home']);
+
+          console.log('🔍 Full response object:', response);
+
+          let userRole = response.role;
+          console.log('🔍 Role from response.role:', userRole);
+
+          // 🛡️ Token Claims Extract Engine
+          if (!userRole && response.token) {
+            try {
+              const decoded: any = jwtDecode(response.token);
+              console.log('🔍 Full decoded token claims:', decoded);
+              
+              userRole = decoded['role'] || decoded['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'];
+              console.log('🔍 Role extracted from token claims:', userRole);
+            } catch (e) {
+              console.error('Token metadata extraction failed:', e);
+            }
+          }
+
+          console.log('🔍 Final userRole target determined:', userRole);
+
+          // 🎯 Application Destination Firewall Router
+        if (userRole && userRole.toLowerCase() === 'admin') {
+            this.router.navigate(['/admin/dashboard']); // 👈 Fixed here!
+          } else {
+            this.router.navigate(['/home']);
+          }
         })
       ),
     { dispatch: false }

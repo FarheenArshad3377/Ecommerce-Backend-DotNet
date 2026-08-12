@@ -165,6 +165,21 @@ namespace Ecommerce.Controllers
 
             await _context.SaveChangesAsync();
         }
+        public async Task UpdateProductRatingAsync(int productId)
+        {
+            var product = await _context.Products
+                .Include(p => p.Reviews)
+                .FirstOrDefaultAsync(p => p.ProductID == productId);
+
+            if (product == null) return;
+
+            product.TotalReviews = product.Reviews.Count;
+            product.AverageRating = product.Reviews.Any()
+                ? product.Reviews.Average(r => r.Rating)
+                : 0;
+
+            await _context.SaveChangesAsync();
+        }
     }
 
     public class AddReviewRequest

@@ -20,7 +20,8 @@ export class ProductDetailComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private productService = inject(ProductService);
-
+ // 👈 new state for the "Added to Cart" modal
+  showAddedModal = signal(false);
   product = signal<ProductDetailDto | null>(null);
   loading = signal(true);
   error = signal('');
@@ -65,14 +66,33 @@ addToCart() {
   this.cartService.addToCart(p.productID, this.qty()).subscribe({
     next: () => {
       this.addingToCart.set(false);
-      this.toastService.show('Cart mein add ho gaya! 🛒', 'success');
+      
+      // Verification Console logs
+      console.log('Cart request successful. Changing signal...');
+      this.showAddedModal.set(true);
+      console.log('showAddedModal current value:', this.showAddedModal());
     },
     error: (err) => {
       this.addingToCart.set(false);
       console.error('Add to cart failed:', err);
-      this.toastService.show('Add to cart nahi ho saka.', 'error');
+      if (err.status === 401) {
+        this.showLoginPrompt.set(true);
+      } else {
+        this.toastService.show('Add to cart nahi ho saka.', 'error');
+      }
     }
   });
+}
+
+showLoginPrompt = signal(false);
+
+closeLoginPrompt(): void {
+  this.showLoginPrompt.set(false);
+}
+
+goToLogin(): void {
+  this.showLoginPrompt.set(false);
+  this.router.navigate(['/login'], { queryParams: { returnUrl: this.router.url } });
 }
   private loadProduct(id: number): void {
     this.loading.set(true);
@@ -93,6 +113,18 @@ addToCart() {
         this.loading.set(false);
       }
     });
+  }
+    closeAddedModal(): void {
+    this.showAddedModal.set(false);
+  }
+
+  goToCart(): void {
+    this.showAddedModal.set(false);
+    this.router.navigate(['/cart']);
+  }
+
+  continueShopping(): void {
+    this.showAddedModal.set(false);
   }
   private saveProductToHistory(productId: number): void {
   this.productService.addToRecentlyViewed(productId).subscribe({

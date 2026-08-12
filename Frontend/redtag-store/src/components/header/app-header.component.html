@@ -1,0 +1,86 @@
+<header class="header">
+  <a routerLink="/" class="logo">RedTag <span>Store</span></a>
+
+  <div class="search-wrap" [class.has-dropdown]="showSuggestions() && searchQuery().trim().length >= 2">
+    <svg class="icon" viewBox="0 0 24 24" width="16" height="16" fill="none">
+      <circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="1.8"/>
+      <path d="M21 21l-4.35-4.35" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+    </svg>
+    <input
+      type="text"
+      placeholder="Search premium products..."
+      [value]="searchQuery()"
+      (input)="onSearchInput($any($event.target).value)"
+      (focus)="onSearchFocus()"
+      (blur)="onSearchBlur()"
+      (keyup.enter)="onSearchSubmit()"
+    />
+
+    <div class="search-dropdown" *ngIf="showSuggestions() && searchQuery().trim().length >= 2">
+      <div class="search-dropdown-loading" *ngIf="searchLoading()">
+        <div class="mini-spinner"></div>
+        <span>Searching...</span>
+      </div>
+
+      <ng-container *ngIf="!searchLoading()">
+        <a class="search-suggestion-item"
+           *ngFor="let product of searchSuggestions()"
+           (mousedown)="goToSuggestion(product)">
+          <div class="suggestion-img-wrap">
+            <img [src]="getImageUrl(product.imageUrl)" [alt]="product.productName" loading="lazy" />
+          </div>
+          <div class="suggestion-info">
+            <span class="suggestion-name">{{ product.productName }}</span>
+            <span class="suggestion-price">${{ displayPrice(product) }}</span>
+          </div>
+        </a>
+
+        <div class="search-dropdown-empty" *ngIf="searchSuggestions().length === 0">
+          <p>"{{ searchQuery() }}" There is no product available.</p>
+        </div>
+
+        <button type="button" class="search-view-all-btn" *ngIf="searchSuggestions().length > 0" (mousedown)="onSearchSubmit()">
+          "{{ searchQuery() }}" See all results →
+        </button>
+      </ng-container>
+    </div>
+  </div>
+
+  <div class="header-right">
+    <div class="header-actions">
+      <button class="icon-btn" routerLink="/cart">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none">
+          <circle cx="9" cy="21" r="1.4" fill="currentColor"/>
+          <circle cx="18" cy="21" r="1.4" fill="currentColor"/>
+          <path d="M2 3h2l2.4 12.4a2 2 0 002 1.6h8.2a2 2 0 002-1.6L21 7H6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span class="badge-count" *ngIf="cartCount > 0">{{ cartCount }}</span>
+      </button>
+
+      <button class="icon-btn" (click)="onAccountIconClick($event)" title="Account">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none">
+          <circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="1.8"/>
+          <path d="M4 20c0-3.3 3.6-6 8-6s8 2.7 8 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
+      </button>
+
+      <button class="icon-btn icon-btn-logout" (click)="requestLogout()" *ngIf="isLoggedIn()" title="Logout">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none">
+          <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M16 17l5-5-5-5M21 12H9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<div class="modal-overlay" *ngIf="showLogoutConfirm()" (click)="cancelLogout()">
+  <div class="modal-box" (click)="$event.stopPropagation()">
+    <h3>Logout?</h3>
+    <p>Are you sure you want to logout?</p>
+    <div class="modal-actions">
+      <button type="button" class="modal-btn modal-btn-cancel" (click)="cancelLogout()">Cancel</button>
+      <button type="button" class="modal-btn modal-btn-confirm" (click)="confirmLogout()">Logout</button>
+    </div>
+  </div>
+</div>

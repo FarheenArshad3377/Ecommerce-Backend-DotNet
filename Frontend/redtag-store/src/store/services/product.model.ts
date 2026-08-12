@@ -82,3 +82,12 @@ export interface ProductFilters {
 export interface ApiResponse<T> {
   data: T;
 }
+export interface ProductAdminDto {
+  productID: number;
+  productName: string;
+  sku: string;
+  price: number;
+  discountPrice?: number;
+  stock: number;
+  category: string;
+}

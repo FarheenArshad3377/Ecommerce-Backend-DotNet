@@ -1,0 +1,123 @@
+<div class="dashboard-container">
+  <!-- Main Content Area -->
+  <main class="main-content">
+    <header class="content-header">
+      <div class="header-title-block">
+        <h1>Admin Dashboard</h1>
+        <p>Poore store ka overview — products, orders, reviews aur revenue.</p>
+      </div>
+      <button class="btn-primary" (click)="openAddProductModal()">
+        + Add New Product
+      </button>
+    </header>
+
+    <!-- Loading State -->
+    <div *ngIf="loading()" class="loading-state">
+      <p>Loading dashboard data...</p>
+    </div>
+
+    <!-- Error State -->
+    <div *ngIf="error()" class="error-state">
+      <p>{{ error() }}</p>
+      <button (click)="ngOnInit()">Retry</button>
+    </div>
+
+    <!-- Dashboard Content -->
+    <div *ngIf="!loading() && stats()" class="dashboard-body">
+      
+      <!-- 4 Top Analytics Cards -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="card-title">Total Revenue</div>
+          <div class="card-value">{{ stats()?.totalRevenue | currency:'PKR':'symbol':'1.0-2' }}</div>
+        </div>
+        <div class="stat-card">
+          <div class="card-title">Total Orders</div>
+          <div class="card-value">{{ stats()?.totalOrders }}</div>
+          <small class="text-warning">{{ stats()?.pendingOrders }} Pending</small>
+        </div>
+        <div class="stat-card">
+          <div class="card-title">Total Products</div>
+          <div class="card-value">{{ stats()?.totalProducts }}</div>
+          <small class="text-danger" *ngIf="(stats()?.lowStockProducts ?? 0) > 0">
+            {{ stats()?.lowStockProducts }} Low Stock
+          </small>
+        </div>
+        <div class="stat-card">
+          <div class="card-title">Avg Rating</div>
+          <div class="card-value">{{ stats()?.averageRating | number:'1.1-1' }} ★</div>
+          <small>{{ stats()?.totalReviews }} Total Reviews</small>
+        </div>
+      </div>
+
+      <!-- Live Database Products Management Table -->
+      <div class="management-section">
+        <div class="data-card full-width">
+          <div class="card-header">
+            <h3>Store Inventory & Products</h3>
+            <span class="badge">{{ adminProducts().length }} Products Total</span>
+          </div>
+          
+          <div class="table-responsive">
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Product Name</th>
+                  <th>SKU</th>
+                  <th>Stock</th>
+                  <th>Price</th>
+                  <th>Discount Price</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let product of adminProducts()">
+  <!-- 1. productId ko badal kar productID kar diya -->
+  <td>#{{ product.productID }}</td>
+  <td>
+    <div class="product-info">
+      <strong>{{ product.productName }}</strong>
+    </div>
+  </td>
+  <td><code>{{ product.sku }}</code></td>
+  <td>
+    <span [class.text-danger]="product.stock <= 5">
+      {{ product.stock }} pcs
+    </span>
+  </td>
+  <td>{{ formatPrice(product.price) }}</td>
+  <td>
+    <span *ngIf="product.discountPrice">
+      {{ formatPrice(product.discountPrice) }}
+    </span>
+    <span *ngIf="!product.discountPrice" class="text-muted">—</span>
+  </td>
+  <td>
+                   <span class="status-badge" 
+      [class.active]="$any(product).isActive || $any(product).IsActive" 
+      [class.inactive]="!($any(product).isActive || $any(product).IsActive)">
+  {{ ($any(product).isActive || $any(product).IsActive) ? 'Active' : 'Inactive' }}
+</span>
+  </td>
+  <td>
+    <div class="action-buttons">
+      <button class="btn-edit" (click)="editProduct(product)">Edit</button>
+      <!-- 3. Yahan bhi productID pass kar diya -->
+      <button class="btn-delete" (click)="deleteProduct(product.productID)">Delete</button>
+    </div>
+  </td>
+</tr>
+                <tr *ngIf="adminProducts().length === 0">
+                  <td colspan="8" class="text-center">No inventory products found in database.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
