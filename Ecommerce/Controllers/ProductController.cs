@@ -11,23 +11,23 @@ namespace Ecommerce.Controllers
     public class ProductsController : ControllerBase
     {
         private readonly AppDbContext _context;
+        private readonly IWebHostEnvironment _environment;
 
-        public ProductsController(AppDbContext context)
+        // IWebHostEnvironment ko inject kiya taaki server par files save ki ja sakein
+        public ProductsController(AppDbContext context, IWebHostEnvironment environment)
         {
             _context = context;
+            _environment = environment;
         }
 
         // =========================================================
-        // NEW: GET: api/products/search?q=shirt&limit=6
-        // Autocomplete Search Endpoint for Header & Chatbot
+        // GET: api/products/search
         // =========================================================
         [HttpGet("search")]
         public async Task<IActionResult> Search([FromQuery] string? q, [FromQuery] int limit = 6)
         {
             if (string.IsNullOrWhiteSpace(q))
-            {
                 return Ok(new List<object>());
-            }
 
             var searchTerm = q.Trim().ToLower();
 
@@ -50,8 +50,7 @@ namespace Ecommerce.Controllers
         }
 
         // =========================================================
-        // NEW: GET: api/products/filter?search=shirt&categoryId=2...
-        // Advanced Filter & Pagination Endpoint
+        // GET: api/products/filter
         // =========================================================
         [HttpGet("filter")]
         public async Task<IActionResult> GetFiltered(
@@ -71,7 +70,6 @@ namespace Ecommerce.Controllers
                 .Where(p => p.IsActive)
                 .AsQueryable();
 
-            // 1. Text Search Filter
             if (!string.IsNullOrWhiteSpace(search))
             {
                 var term = search.Trim().ToLower();
@@ -79,35 +77,21 @@ namespace Ecommerce.Controllers
                                          (p.Description != null && p.Description.ToLower().Contains(term)));
             }
 
-            // 2. Category Filter
             if (categoryId.HasValue)
-            {
                 query = query.Where(p => p.CategoryID == categoryId.Value);
-            }
 
-            // 3. Price Filter
             if (minPrice.HasValue)
-            {
                 query = query.Where(p => (p.DiscountPrice ?? p.Price) >= minPrice.Value);
-            }
+
             if (maxPrice.HasValue)
-            {
                 query = query.Where(p => (p.DiscountPrice ?? p.Price) <= maxPrice.Value);
-            }
 
-            // 4. Rating Filter
             if (minRating.HasValue)
-            {
                 query = query.Where(p => p.AverageRating >= minRating.Value);
-            }
 
-            // 5. In-Stock Filter
             if (inStockOnly)
-            {
                 query = query.Where(p => p.Stock > 0);
-            }
 
-            // 6. Dynamic Sorting Logic
             query = sortBy.ToLower() switch
             {
                 "price_asc" => query.OrderBy(p => p.DiscountPrice ?? p.Price),
@@ -127,6 +111,7 @@ namespace Ecommerce.Controllers
                 {
                     p.ProductID,
                     p.ProductName,
+                    p.Description,
                     p.Price,
                     p.DiscountPrice,
                     p.Stock,
@@ -135,6 +120,7 @@ namespace Ecommerce.Controllers
                     p.IsFeatured,
                     p.AverageRating,
                     p.TotalReviews,
+                    p.CategoryID, // 👈 Added here for Admin Edit matching pipeline
                     Category = p.Category != null ? p.Category.CategoryName : null,
                     Images = p.Images.OrderBy(i => i.DisplayOrder).Select(i => i.ImageUrl)
                 })
@@ -150,7 +136,9 @@ namespace Ecommerce.Controllers
             });
         }
 
+        // =========================================================
         // GET: api/products
+        // =========================================================
         [HttpGet]
         public async Task<IActionResult> GetAll(
             [FromQuery] int page = 1,
@@ -200,6 +188,7 @@ namespace Ecommerce.Controllers
                 {
                     p.ProductID,
                     p.ProductName,
+                    p.Description,
                     p.Price,
                     p.DiscountPrice,
                     p.Stock,
@@ -208,6 +197,7 @@ namespace Ecommerce.Controllers
                     p.IsFeatured,
                     p.AverageRating,
                     p.TotalReviews,
+                    p.CategoryID, // 👈 Added here to fix the Admin Inventory Form view context
                     Category = p.Category != null ? p.Category.CategoryName : null,
                     Images = p.Images.OrderBy(i => i.DisplayOrder).Select(i => i.ImageUrl)
                 })
@@ -223,7 +213,9 @@ namespace Ecommerce.Controllers
             });
         }
 
+        // =========================================================
         // GET: api/products/5
+        // =========================================================
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
@@ -266,10 +258,12 @@ namespace Ecommerce.Controllers
             });
         }
 
-        // POST: api/products — Admin only
+        // =========================================================
+        // FIXED POST: [FromForm] implemented with disk write logic
+        // =========================================================
         [HttpPost]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> Create([FromBody] CreateProductRequest dto)
+        public async Task<IActionResult> Create([FromForm] CreateProductRequest dto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -277,6 +271,28 @@ namespace Ecommerce.Controllers
             bool categoryExists = await _context.Categories.AnyAsync(c => c.CategoryID == dto.CategoryID);
             if (!categoryExists)
                 return BadRequest(new { message = "Category not found." });
+
+            string? dbImageUrl = dto.ImageUrl;
+
+            // Agar user ne file upload ki hai toh usko server local directory me write karenge
+            if (dto.ImageFile != null && dto.ImageFile.Length > 0)
+            {
+                var uploadsFolder = Path.Combine(_environment.WebRootPath, "uploads");
+                if (!Directory.Exists(uploadsFolder))
+                {
+                    Directory.CreateDirectory(uploadsFolder);
+                }
+
+                var uniqueFileName = Guid.NewGuid().ToString() + "_" + Path.GetFileName(dto.ImageFile.FileName);
+                var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                using (var fileStream = new FileStream(filePath, FileMode.Create))
+                {
+                    await dto.ImageFile.CopyToAsync(fileStream);
+                }
+
+                dbImageUrl = "/uploads/" + uniqueFileName;
+            }
 
             var product = new ProductModel
             {
@@ -286,10 +302,11 @@ namespace Ecommerce.Controllers
                 DiscountPrice = dto.DiscountPrice,
                 Stock = dto.Stock,
                 SKU = dto.SKU,
-                ImageUrl = dto.ImageUrl,
+                ImageUrl = dbImageUrl,
                 IsFeatured = dto.IsFeatured,
                 IsActive = true,
-                CategoryID = dto.CategoryID
+                CategoryID = dto.CategoryID,
+                CreatedDate = DateTime.UtcNow
             };
 
             _context.Products.Add(product);
@@ -298,14 +315,39 @@ namespace Ecommerce.Controllers
             return Ok(new { product.ProductID, product.ProductName });
         }
 
-        // PUT: api/products/5 — Admin only
+        // =========================================================
+        // FIXED PUT: [FromForm] handling image modifications
+        // =========================================================
         [HttpPut("{id}")]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> Update(int id, [FromBody] CreateProductRequest dto)
+        public async Task<IActionResult> Update(int id, [FromForm] CreateProductRequest dto)
         {
             var product = await _context.Products.FindAsync(id);
             if (product == null)
                 return NotFound(new { message = "Product not found." });
+
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            // Nayi image upload logic
+            if (dto.ImageFile != null && dto.ImageFile.Length > 0)
+            {
+                var uploadsFolder = Path.Combine(_environment.WebRootPath, "uploads");
+                if (!Directory.Exists(uploadsFolder))
+                {
+                    Directory.CreateDirectory(uploadsFolder);
+                }
+
+                var uniqueFileName = Guid.NewGuid().ToString() + "_" + Path.GetFileName(dto.ImageFile.FileName);
+                var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                using (var fileStream = new FileStream(filePath, FileMode.Create))
+                {
+                    await dto.ImageFile.CopyToAsync(fileStream);
+                }
+
+                product.ImageUrl = "/uploads/" + uniqueFileName;
+            }
 
             product.ProductName = dto.ProductName;
             product.Description = dto.Description;
@@ -313,7 +355,6 @@ namespace Ecommerce.Controllers
             product.DiscountPrice = dto.DiscountPrice;
             product.Stock = dto.Stock;
             product.SKU = dto.SKU;
-            product.ImageUrl = dto.ImageUrl;
             product.IsFeatured = dto.IsFeatured;
             product.CategoryID = dto.CategoryID;
             product.UpdatedDate = DateTime.UtcNow;
@@ -322,7 +363,9 @@ namespace Ecommerce.Controllers
             return Ok(new { message = "Product updated successfully." });
         }
 
-        // DELETE: api/products/5 — Admin only (soft delete)
+        // =========================================================
+        // DELETE: api/products/5
+        // =========================================================
         [HttpDelete("{id}")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int id)
@@ -339,7 +382,7 @@ namespace Ecommerce.Controllers
         }
     }
 
-    // ─── Request DTO ─────────────────────────────────────────────────────────
+    // DTO keeps matching Angular context rules flawlessly
     public class CreateProductRequest
     {
         public string ProductName { get; set; } = string.Empty;
@@ -351,5 +394,6 @@ namespace Ecommerce.Controllers
         public string? ImageUrl { get; set; }
         public bool IsFeatured { get; set; } = false;
         public int CategoryID { get; set; }
+        public IFormFile? ImageFile { get; set; }
     }
 }

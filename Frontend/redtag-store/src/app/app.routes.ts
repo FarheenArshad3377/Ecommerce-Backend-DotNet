@@ -2,7 +2,7 @@ import { Routes } from '@angular/router';
 import { CheckoutComponent } from './pages/checkout/checkout.component';
 import { authGuard } from './core/guards/auth.guard';
 import { adminGuard } from './guards/admin-guard'; // Guard ka path exact match rakhein
-import { DashboardComponent } from './pages/dashboard/dashboard.component';
+import { DashboardComponent } from './admin/dashboard/dashboard.component';
 
 // Admin Pages Imports
 import { ProductsComponent } from './admin/products/products.component';

@@ -1,44 +1,142 @@
-<div class="admin-page-container">
-  <div class="page-header">
-    <div>
-      <h1 class="page-title">Manage Products</h1>
-      <p class="page-subtitle">Apne store ke saare products yahan se control karein.</p>
+<div class="dashboard-container">
+  <header class="page-header">
+    <div class="header-title">
+      <h2>Products Inventory</h2>
+      <p>Manage your e-commerce products and track stock details</p>
     </div>
-    <button class="add-btn">
-      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
-        <line x1="12" y1="5" x2="12" y2="19"></line>
-        <line x1="5" y1="12" x2="19" y2="12"></line>
-      </svg>
-      Add New Product
-    </button>
+    <button class="btn-primary" (click)="openAddProductModal()">+ Add Product</button>
+  </header>
+
+  <!-- Dynamic Metrics Overview based on real DB values -->
+  <div class="metrics-grid">
+    <div class="card">
+      <span class="card-icon">📦</span>
+      <div>
+        <h3>Total Items</h3>
+        <p class="metric-value">{{ products.length }}</p>
+      </div>
+    </div>
+    <div class="card">
+      <span class="card-icon warning">⚠️</span>
+      <div>
+        <h3>Low Stock Alert</h3>
+        <p class="metric-value warning">{{ getLowStockCount() }}</p>
+      </div>
+    </div>
   </div>
 
+  <!-- Modern Table Displaying Database Fields -->
   <div class="table-container">
-    <table class="admin-table">
-      <thead>
-        <tr>
-          <th>Image</th>
-          <th>Product Name</th>
-          <th>Price</th>
-          <th>Stock</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        <!-- Dummy Row: Jab aap real service integrate karenge to yahan *ngFor lag jayega -->
-        <tr>
-          <td><div class="img-placeholder"></div></td>
-          <td><strong class="item-name">Sample T-Shirt</strong></td>
-          <td>PKR 1,500</td>
-          <td><span class="status-badge status-delivered">In Stock (45)</span></td>
-          <td>
-            <div class="action-actions">
-              <button class="icon-btn edit">Edit</button>
-              <button class="icon-btn delete">Delete</button>
-            </div>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+
+    <!-- Loading state -->
+    <div class="state-block" *ngIf="loading">
+      <div class="spinner"></div>
+      <p>Loading products…</p>
+    </div>
+
+    <!-- Empty state -->
+    <div class="state-block" *ngIf="!loading && products.length === 0">
+      <span class="state-icon">🗂️</span>
+      <p>No products yet.</p>
+      <button class="btn-primary" (click)="openAddProductModal()">+ Add your first product</button>
+    </div>
+
+<table class="custom-table" *ngIf="!loading && products.length > 0">
+  <thead>
+    <tr>
+      <th>Preview</th>
+      <th>Product Details</th>
+      <th>SKU</th>
+      <th>Pricing</th>
+      <th>Inventory</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let product of products; trackBy: trackByProductId">
+      <td>
+        <div class="product-img-wrapper">
+          <img [src]="getImageUrl(product.imageUrl)"
+               [alt]="product.productName"
+               onerror="this.onerror=null; this.src='assets/fallback-placeholder.png'">
+        </div>
+      </td>
+
+      <td class="product-details">
+        <div class="product-title-row">
+          <span class="product-title">{{ product.productName }}</span>
+          <span class="tag-status" [ngClass]="product.isActive === 1 ? 'status-active' : 'status-disabled'">
+            {{ product.isActive === 1 ? 'Active' : 'Hidden' }}
+          </span>
+          <span class="tag-featured" *ngIf="product.isFeatured">⭐ Featured</span>
+        </div>
+        <span class="product-desc">{{ product.description }}</span>
+      </td>
+
+      <td class="sku-cell">
+        <span class="sku-text">{{ product.sku }}</span>
+      </td>
+
+      <td>
+        <div class="price-box">
+          <span class="current-price">Rs. {{ product.discountPrice | number }}</span>
+          <span class="original-price" *ngIf="product.discountPrice !== null && product.discountPrice < product.price">
+            Rs. {{ product.price | number }}
+          </span>
+        </div>
+      </td>
+
+      <td>
+        <div class="stock-info">
+          <span class="stock-num">{{ product.stock }} units</span>
+          <div class="progress-bar-bg">
+            <div class="progress-bar-fill" [style.width.%]="product.stock > 100 ? 100 : product.stock"
+                 [ngClass]="{'low-bar': product.stock <= 20, 'good-bar': product.stock > 20}"></div>
+          </div>
+        </div>
+      </td>
+
+      <td>
+        <div class="action-actions">
+          <button class="action-btn edit-icon" title="Edit Product" (click)="openEditModal(product)">✏️</button>
+          <button class="action-btn delete-icon" title="Delete Product" (click)="openDeleteConfirm(product)">🗑️</button>
+        </div>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
   </div>
+
+  <!-- Add / Edit Modal -->
+  <app-product-form-modal
+    [isOpen]="isModalOpen"
+    [editProduct]="productBeingEdited"
+    (closed)="closeModal()"
+    (saved)="onProductSaved()">
+  </app-product-form-modal>
+
+  <!-- Delete Confirmation Modal -->
+  <div class="modal-backdrop" *ngIf="isDeleteConfirmOpen" (click)="cancelDelete()">
+    <div class="modal-box confirm-box" (click)="$event.stopPropagation()">
+      <header class="modal-header">
+        <h3>Delete Product</h3>
+        <button class="close-x" (click)="cancelDelete()">&times;</button>
+      </header>
+      <div class="form-body">
+        <p class="confirm-text">
+          Are you sure you want to delete
+          <strong>{{ productToDelete?.productName }}</strong>?
+          This action can't be undone.
+        </p>
+      </div>
+      <footer class="modal-actions">
+        <button type="button" class="btn-secondary" (click)="cancelDelete()" [disabled]="deleting">Cancel</button>
+        <button type="button" class="btn-danger" (click)="confirmDelete()" [disabled]="deleting">
+          {{ deleting ? 'Deleting…' : 'Yes, Delete' }}
+        </button>
+      </footer>
+    </div>
+  </div>
+
 </div>

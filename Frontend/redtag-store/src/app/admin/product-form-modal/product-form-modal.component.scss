@@ -1,0 +1,318 @@
+@use '../../../shared/styles/tokens.scss' as *;
+// ============================================
+// Modal — "Price Tag" card
+// Signature: the modal itself is shaped like a tag — a
+// clipped top-right corner plus a punched gold-ringed hole —
+// so the one place we open a form doubles as a brand moment.
+// ============================================
+
+$tag-hole: 20px;      // hole diameter
+$tag-cut: 26px;        // size of the clipped corner
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(36, 27, 29, 0.45);
+  backdrop-filter: blur(3px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: $z-modal;
+  padding: $space-4;
+  animation: rt-fade-in $duration-base ease;
+}
+
+.modal-box {
+  position: relative;
+  font-family: $font-body;
+  background: $card-bg;
+  border-radius: $radius-lg;
+  width: 100%;
+  max-width: 480px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: $shadow-card;
+  clip-path: polygon(
+    0 0,
+    calc(100% - #{$tag-cut}) 0,
+    100% #{$tag-cut},
+    100% 100%,
+    0 100%
+  );
+  animation: rt-slide-up 0.22s $ease-standard;
+
+  // faux tag-hole punched into the clipped corner
+  &::before {
+    content: '';
+    position: absolute;
+    top: 9px;
+    right: 9px;
+    width: $tag-hole;
+    height: $tag-hole;
+    border-radius: 50%;
+    background: $black;
+    box-shadow: inset 0 0 0 2px $gold, 0 1px 2px rgba(36, 27, 29, 0.18);
+  }
+
+  // scrollbar restraint on webkit — keep it from fighting the tag shape
+  &::-webkit-scrollbar { width: 8px; }
+  &::-webkit-scrollbar-thumb {
+    background: $border-strong;
+    border-radius: 8px;
+  }
+}
+
+.modal-header {
+  position: sticky;
+  top: 0;
+  background: $card-bg;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $space-5 40px $space-4 $space-6;
+  z-index: 1;
+
+  h3 {
+    margin: 0;
+    font-family: $font-heading;
+    font-size: 19px;
+    font-weight: 600;
+    color: $text-light;
+    letter-spacing: -0.01em;
+  }
+
+  // perforated "tear here" line instead of a flat border — reads as a tag stub
+  &::after {
+    content: '';
+    position: absolute;
+    left: $space-6;
+    right: $space-6;
+    bottom: 0;
+    height: 1px;
+    background-image: repeating-linear-gradient(
+      to right,
+      $border-strong 0,
+      $border-strong 5px,
+      transparent 5px,
+      transparent 10px
+    );
+  }
+}
+
+.close-x {
+  background: none;
+  border: none;
+  font-size: 20px;
+  line-height: 1;
+  color: $text-muted;
+  cursor: pointer;
+  padding: 4px 9px;
+  border-radius: $radius-sm;
+  transition: background $duration-fast ease, color $duration-fast ease;
+
+  &:hover {
+    background: $black-soft;
+    color: $red-primary;
+  }
+  &:focus-visible {
+    outline: 2px solid $red-primary;
+    outline-offset: 1px;
+  }
+}
+
+.form-body {
+  padding: $space-5 $space-6 $space-1;
+  display: flex;
+  flex-direction: column;
+  gap: $space-4;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: $space-4;
+
+  @media (max-width: 420px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: $space-2 * 0.75;
+
+  label {
+    font-family: $font-body;
+    font-size: 12.5px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    color: $text-muted;
+
+    .required {
+      color: $red-primary;
+    }
+  }
+
+  input,
+  select,
+  textarea {
+    @include field-input;
+  }
+
+  textarea {
+    resize: vertical;
+    min-height: 76px;
+    font-family: inherit;
+  }
+
+  select {
+    appearance: none;
+    background-image: linear-gradient(45deg, transparent 50%, $text-muted 50%),
+      linear-gradient(135deg, $text-muted 50%, transparent 50%);
+    background-position: calc(100% - 18px) 55%, calc(100% - 13px) 55%;
+    background-size: 5px 5px, 5px 5px;
+    background-repeat: no-repeat;
+    padding-right: 34px;
+  }
+}
+
+.form-checkboxes {
+  display: flex;
+  flex-direction: column;
+  gap: $space-3 - 2px;
+  padding: $space-1 0 $space-4;
+}
+
+.chk-label {
+  display: flex;
+  align-items: center;
+  gap: $space-2;
+  font-size: 14px;
+  color: $text-light;
+  cursor: pointer;
+
+  input[type='checkbox'] {
+    width: 17px;
+    height: 17px;
+    accent-color: $red-primary;
+    cursor: pointer;
+  }
+}
+
+.modal-actions {
+  position: sticky;
+  bottom: 0;
+  background: $card-bg;
+  display: flex;
+  justify-content: flex-end;
+  gap: $space-3 - 2px;
+  padding: $space-4 $space-6 $space-5;
+  border-top: 1px dashed $border-subtle;
+}
+
+.btn-primary {
+  @include gold-button;
+}
+
+.btn-secondary {
+  @include ghost-button;
+}
+// Product image dropzone
+.file-drop {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  min-height: 92px;
+  border: 1.5px dashed $border-strong;
+  border-radius: $radius-sm;
+  background: $black-soft;
+  cursor: pointer;
+  overflow: hidden;
+  transition: border-color $duration-fast ease, background $duration-fast ease;
+
+  &:hover {
+    border-color: $red-primary;
+    background: #fff;
+  }
+
+  .file-input {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+  }
+
+  .file-drop-icon {
+    font-size: 22px;
+  }
+
+  .file-drop-text {
+    font-size: 13px;
+    font-weight: 600;
+    color: $text-light;
+  }
+
+  .file-drop-hint {
+    font-size: 11.5px;
+    color: $text-muted;
+  }
+
+  &.file-drop--filled {
+    border-style: solid;
+    padding: $space-2;
+  }
+
+  .file-drop-preview {
+    max-height: 110px;
+    width: auto;
+    border-radius: $radius-sm - 2px;
+    display: block;
+  }
+}
+
+.required {
+  color: $red-primary;
+}
+// ============================================
+// Delete-confirm variant — same tag shape, tighter body
+// ============================================
+.modal-box.modal-box--confirm {
+  max-width: 420px;
+
+  .form-body {
+    padding: $space-5 $space-6;
+  }
+
+  .confirm-text {
+    margin: 0;
+    font-size: 14px;
+    color: $text-muted;
+    line-height: 1.6;
+
+    strong {
+      color: $text-light;
+    }
+  }
+}
+
+@keyframes rt-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes rt-slide-up {
+  from { opacity: 0; transform: translateY(12px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .modal-backdrop,
+  .modal-box {
+    animation: none;
+  }
+}

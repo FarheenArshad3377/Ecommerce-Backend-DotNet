@@ -1,0 +1,85 @@
+<div class="modal-backdrop" *ngIf="isOpen" (click)="close()">
+  <div class="modal-box" (click)="$event.stopPropagation()">
+    <header class="modal-header">
+      <h3>{{ editProduct ? 'Edit Product' : 'Add New Product' }}</h3>
+      <button class="close-x" type="button" (click)="close()">&times;</button>
+    </header>
+
+    <form [formGroup]="productForm" (ngSubmit)="onSubmit()">
+      <div class="form-body">
+
+        <div class="form-group">
+          <label>Product Name <span class="required">*</span></label>
+          <input type="text" formControlName="productName" placeholder="Enter product name">
+        </div>
+
+        <!-- Custom Dropdown Menu tracking backend Categories context -->
+        <div class="form-group">
+          <label>Category <span class="required">*</span></label>
+          <select formControlName="categoryID">
+            <option [ngValue]="null">Select a category</option>
+            <option *ngFor="let cat of categories" [ngValue]="cat.categoryID || cat.categoryId">
+              {{ cat.categoryName }}
+            </option>
+          </select>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>SKU <span class="required">*</span></label>
+            <input type="text" formControlName="sku" placeholder="e.g., SPRT-013">
+          </div>
+          <div class="form-group">
+            <label>Stock <span class="required">*</span></label>
+            <input type="number" formControlName="stock" placeholder="0">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Price (Rs.) <span class="required">*</span></label>
+            <input type="number" formControlName="price" placeholder="0">
+          </div>
+          <div class="form-group">
+            <label>Discount Price (Rs.)</label>
+            <input type="number" formControlName="discountPrice" placeholder="Optional">
+          </div>
+        </div>
+
+        <!-- Product Image — same input/handler, nicer dropzone shell around it -->
+        <div class="form-group">
+          <label>Product Image</label>
+          <label class="file-drop" [class.file-drop--filled]="imagePreview">
+            <input type="file" (change)="onFileSelected($event)" accept="image/*" class="file-input">
+            <ng-container *ngIf="!imagePreview">
+              <span class="file-drop-icon">🖼️</span>
+              <span class="file-drop-text">Click to upload an image</span>
+              <span class="file-drop-hint">PNG or JPG</span>
+            </ng-container>
+            <img *ngIf="imagePreview" [src]="imagePreview" alt="Preview" class="file-drop-preview">
+          </label>
+        </div>
+
+        <div class="form-group">
+          <label>Description</label>
+          <textarea formControlName="description" rows="3" placeholder="Enter details..."></textarea>
+        </div>
+
+        <div class="form-checkboxes">
+          <label class="chk-label">
+            <input type="checkbox" formControlName="isFeatured">
+            <span>⭐ Feature this product</span>
+          </label>
+        </div>
+
+      </div>
+
+      <footer class="modal-actions">
+        <button type="button" class="btn-secondary" (click)="close()" [disabled]="isSubmitting">Cancel</button>
+        <button type="submit" class="btn-primary" [disabled]="productForm.invalid || isSubmitting">
+          {{ isSubmitting ? 'Saving...' : 'Save Product' }}
+        </button>
+      </footer>
+    </form>
+  </div>
+</div>

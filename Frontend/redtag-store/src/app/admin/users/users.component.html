@@ -1,29 +1,100 @@
-<div class="admin-page-container">
-  <div class="page-header">
-    <div>
-      <h1 class="page-title">Registered Users</h1>
-      <p class="page-subtitle">Aap ke store par total users ki detailed list.</p>
+<div class="dashboard-container">
+  <header class="page-header">
+    <div class="header-title">
+      <h2>Registered Users</h2>
+      <p>Aap ke store par total users ki detailed list.</p>
+    </div>
+  </header>
+
+  <div class="toolbar-row">
+    <div class="status-filters">
+      <button class="filter-chip" [class.filter-chip--active]="roleFilter === null" (click)="filterByRole(null)">All</button>
+      <button class="filter-chip" [class.filter-chip--active]="roleFilter === 'Customer'" (click)="filterByRole('Customer')">Customer</button>
+      <button class="filter-chip" [class.filter-chip--active]="roleFilter === 'Admin'" (click)="filterByRole('Admin')">Admin</button>
+    </div>
+
+    <div class="search-box">
+      <input
+        type="text"
+        placeholder="Search by name or email…"
+        [(ngModel)]="searchTerm"
+        (ngModelChange)="onSearchChange()">
     </div>
   </div>
 
   <div class="table-container">
-    <table class="admin-table">
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Email</th>
-          <th>Role</th>
-          <th>Status</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>Sana Ahmed</td>
-          <td>sana@example.com</td>
-          <td><span class="status-badge status-pending">Customer</span></td>
-          <td>Active</td>
-        </tr>
-      </tbody>
-    </table>
+
+    <div class="state-block" *ngIf="loading">
+      <div class="spinner"></div>
+      <p>Loading users…</p>
+    </div>
+
+    <div class="state-block" *ngIf="!loading && error">
+      <span class="state-icon">⚠️</span>
+      <p>Could not load users. Please try again.</p>
+      <button class="btn-primary" (click)="loadUsers()">Retry</button>
+    </div>
+
+    <div class="state-block" *ngIf="!loading && !error && users.length === 0">
+      <span class="state-icon">👤</span>
+      <p>No users found.</p>
+    </div>
+
+<table class="custom-table users-table" *ngIf="!loading && !error && filteredUsers.length > 0">
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Email</th>
+      <th>Phone</th>
+      <th>Role</th>
+      <th>Orders</th>
+      <th>Status</th>
+      <th>Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let user of filteredUsers; trackBy: trackByUserId">
+      <td class="user-name">{{ user.firstName }} {{ user.lastName }}</td>
+      <td class="user-email">{{ user.email }}</td>
+      <td class="user-phone">{{ user.phoneNumber || '—' }}</td>
+      <td>
+        <span class="role-badge" [class.role-badge--admin]="user.role === 'Admin'">
+          {{ user.role }}
+        </span>
+      </td>
+      <td class="order-count">{{ user.orderCount }}</td>
+      <td>
+        <span class="status-badge" [class.status-badge--active]="user.isActive" [class.status-badge--inactive]="!user.isActive">
+          {{ user.isActive ? 'Active' : 'Disabled' }}
+        </span>
+      </td>
+      <td>
+        <button
+          class="toggle-status-btn"
+          [class.toggle-status-btn--danger]="user.isActive"
+          [disabled]="togglingId === user.userID || user.role === 'Admin'"
+          [title]="user.role === 'Admin' ? 'Admin accounts can\'t be deactivated' : ''"
+          (click)="toggleStatus(user)">
+          {{ togglingId === user.userID ? '…' : (user.isActive ? 'Disable' : 'Enable') }}
+        </button>
+        <span class="toggle-error" *ngIf="toggleErrorId === user.userID">Failed</span>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="state-block" *ngIf="!loading && !error && filteredUsers.length === 0">
+  <span class="state-icon">👤</span>
+  <p>No users match this filter.</p>
+</div>
+
+    <div class="pagination-bar" *ngIf="!loading && !error && users.length > 0">
+      <span class="pagination-info">Page {{ page }} of {{ totalPages }} · {{ total }} users</span>
+      <div class="pagination-controls">
+        <button class="btn-secondary" (click)="prevPage()" [disabled]="page <= 1">Previous</button>
+        <button class="btn-secondary" (click)="nextPage()" [disabled]="page >= totalPages">Next</button>
+      </div>
+    </div>
+
   </div>
 </div>

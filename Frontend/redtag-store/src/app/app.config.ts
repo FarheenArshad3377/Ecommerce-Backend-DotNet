@@ -13,7 +13,7 @@ export const appConfig: ApplicationConfig = {
   providers: [
     // 1. Sirf ek bar provideHttpClient rakhein interceptor ke saath
     provideHttpClient(withInterceptors([authInterceptor])), 
-    
+    provideHttpClient(),
     // 2. Component input binding ke saath router configuration
     provideRouter(routes, withComponentInputBinding()),
     

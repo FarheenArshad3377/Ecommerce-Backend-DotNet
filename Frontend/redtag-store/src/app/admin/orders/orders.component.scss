@@ -1,6 +1,7 @@
 @use '../../../shared/styles/tokens.scss' as *;
 
-/* ============ Shared layout (duplicated — Angular scopes component styles) ============ */
+/* ============ Shared layout (duplicated here because Angular scopes
+   component styles — products component's .scss doesn't reach this one) ============ */
 .dashboard-container {
   font-family: $font-body;
   padding: $space-8 - 4px $space-8 60px;
@@ -112,10 +113,26 @@
 }
 
 @media (max-width: 720px) {
-  .dashboard-container { padding: $space-5 - 2px; }
-  .page-header { flex-direction: column; }
-  .table-container { overflow-x: auto; }
-  .custom-table { min-width: 760px; }
+  .dashboard-container {
+    padding: $space-5 - 2px;
+  }
+  .page-header {
+    flex-direction: column;
+  }
+  .table-container {
+    overflow-x: auto;
+  }
+  .custom-table {
+    min-width: 720px;
+  }
+}
+
+/* ============ Orders-specific ============ */
+.status-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $space-2;
+  margin-bottom: $space-5;
 }
 
 .filter-chip {
@@ -142,123 +159,105 @@
   }
 }
 
-/* ============ Users-specific ============ */
-.toolbar-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: $space-3;
-  margin-bottom: $space-5;
-}
-
-.status-filters {
-  display: flex;
-  flex-wrap: wrap;
-  gap: $space-2;
-}
-
-.search-box {
-  input {
-    @include field-input;
-    width: 240px;
-  }
-}
-
-.users-table {
-  th:nth-child(1), td:nth-child(1) { width: auto; }
-  th:nth-child(2), td:nth-child(2) { width: 220px; }
+.orders-table {
+  th:nth-child(1), td:nth-child(1) { width: 140px; }
+  th:nth-child(2), td:nth-child(2) { width: auto; }
   th:nth-child(3), td:nth-child(3) { width: 130px; }
-  th:nth-child(4), td:nth-child(4) { width: 110px; }
-  th:nth-child(5), td:nth-child(5) { width: 90px; }
-  th:nth-child(6), td:nth-child(6) { width: 110px; }
-  th:nth-child(7), td:nth-child(7) { width: 110px; }
+  th:nth-child(4), td:nth-child(4) { width: 130px; }
+  th:nth-child(5), td:nth-child(5) { width: 140px; }
+  th:nth-child(6), td:nth-child(6) { width: 140px; }
 }
 
-.user-name {
+.order-id {
+  font-family: 'SFMono-Regular', Consolas, monospace;
+  font-size: 12.5px;
   font-weight: 600;
   color: $text-light;
-}
-
-.user-email {
-  color: $text-muted;
-  font-size: 13.5px;
-}
-
-.user-phone {
-  color: $text-muted;
-  font-size: 13.5px;
-}
-
-.order-count {
-  font-weight: 600;
-  color: $text-light;
-}
-
-.role-badge {
-  display: inline-block;
-  font-size: 11px;
-  font-weight: 700;
-  padding: 3px 10px;
-  border-radius: 999px;
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
   background: $black-soft;
-  color: $text-muted;
+  padding: 3px 8px;
+  border-radius: 6px;
+  display: inline-block;
+}
 
-  &.role-badge--admin {
-    background: $gold-glow;
-    color: $gold-soft;
-  }
+.customer-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.customer-name {
+  font-weight: 600;
+  color: $text-light;
+}
+
+.customer-email {
+  font-size: 12.5px;
+  color: $text-muted;
+}
+
+.order-date {
+  color: $text-muted;
+  font-size: 13.5px;
+}
+
+.order-total {
+  font-weight: 700;
+  color: $text-light;
 }
 
 .status-badge {
   display: inline-block;
   font-size: 11px;
   font-weight: 700;
-  padding: 3px 10px;
+  padding: 4px 11px;
   border-radius: 999px;
   text-transform: uppercase;
   letter-spacing: 0.03em;
+  white-space: nowrap;
 
-  &.status-badge--active {
+  &.status-pending {
+    background: $amber-bg;
+    color: $gold-soft;
+  }
+  &.status-confirmed {
+    background: $gold-glow;
+    color: $gold-soft;
+  }
+  &.status-processing {
+    background: transparent;
+    color: $red-primary;
+    border: 1.5px dashed $border-strong;
+  }
+  &.status-shipped {
+    background: $black-soft;
+    color: $text-light;
+  }
+  &.status-delivered {
     background: $green-bg;
     color: $green;
   }
-  &.status-badge--inactive {
-    background: $red-alert-bg;
-    color: $red-alert;
+  &.status-cancelled {
+    background: $red-primary;
+    color: $text-dark;
   }
 }
 
-.toggle-status-btn {
+.view-details-btn {
   font-family: $font-body;
-  font-size: 12.5px;
+  font-size: 13px;
   font-weight: 600;
-  color: $green;
+  color: $red-primary;
   background: $card-bg;
   border: 1.5px solid $border-subtle;
   border-radius: $radius-sm;
-  padding: 7px 13px;
+  padding: 8px 14px;
   cursor: pointer;
   white-space: nowrap;
   transition: background $duration-fast ease, border-color $duration-fast ease;
 
-  &:hover:not(:disabled) {
-    background: $green-bg;
-  }
-  &:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-  }
-
-  &.toggle-status-btn--danger {
-    color: $red-primary;
-
-    &:hover:not(:disabled) {
-      background: $red-alert-bg;
-      border-color: $red-alert;
-    }
+  &:hover {
+    background: $red-glow;
+    border-color: $border-strong;
   }
 }
 
@@ -279,5 +278,7 @@
   display: flex;
   gap: $space-2;
 
-  .btn-secondary { padding: 8px 16px; }
+  .btn-secondary {
+    padding: 8px 16px;
+  }
 }

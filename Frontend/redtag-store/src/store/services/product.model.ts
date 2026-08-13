@@ -16,12 +16,14 @@ export interface ReviewDto {
 export interface ProductListDto {
   productID: number;
   productName: string;
+  description?: string;
   price: number;
   discountPrice: number | null;
   stock: number;
   sku: string;
   imageUrl: string;
-  isFeatured: boolean;
+  isFeatured: boolean; // Keep this strictly boolean to match global context
+  isActive: number;
   averageRating: number;
   totalReviews: number;
   category: string;
@@ -38,7 +40,8 @@ export interface ProductDetailDto {
   stock: number;
   sku: string;
   imageUrl: string;
-  isFeatured: boolean;
+  isFeatured: boolean; // Keep this boolean to avoid type collision
+  isActive: number;
   averageRating: number;
   totalReviews: number;
   createdDate: string;
@@ -46,6 +49,7 @@ export interface ProductDetailDto {
   images: ProductImageDto[];
   reviews: ReviewDto[];
 }
+
 export interface Product {
   productID: number;
   productName: string;
@@ -54,7 +58,7 @@ export interface Product {
   stock: number;
   sku: string;
   imageUrl?: string;
-  isFeatured: boolean;
+  isFeatured: boolean; // Keep this boolean
   averageRating: number;
   totalReviews: number;
   category: string;
@@ -74,14 +78,16 @@ export interface ProductFilters {
   pageSize?: number;
   categoryId?: number;
   search?: string;
-  isFeatured?: boolean;
+  isFeatured?: boolean; // Keep this boolean
   minPrice?: number;
   maxPrice?: number;
   sortBy?: string;
 }
+
 export interface ApiResponse<T> {
   data: T;
 }
+
 export interface ProductAdminDto {
   productID: number;
   productName: string;

@@ -40,7 +40,7 @@ export class AuthEffects {
     )
   );
 
-  authSuccess$ = createEffect(
+authSuccess$ = createEffect(
     () =>
       this.actions$.pipe(
         ofType(AuthActions.registerSuccess, AuthActions.loginSuccess),
@@ -68,12 +68,9 @@ export class AuthEffects {
 
           console.log('🔍 Final userRole target determined:', userRole);
 
-          // 🎯 Application Destination Firewall Router
-        if (userRole && userRole.toLowerCase() === 'admin') {
-            this.router.navigate(['/admin/dashboard']); // 👈 Fixed here!
-          } else {
-            this.router.navigate(['/home']);
-          }
+          // 🎯 Sab users (admin ho ya customer) ab home pe jayenge.
+          //    Admin wahan se floating pill button se dashboard tak pahunch sakta hai.
+          this.router.navigate(['/home']);
         })
       ),
     { dispatch: false }
